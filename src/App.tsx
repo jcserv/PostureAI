@@ -1,51 +1,54 @@
+import { ChakraProvider, VStack } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import Webcam from "react-webcam";
 
-import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
-import { ChakraProvider, VStack } from '@chakra-ui/react';
-import React, { useState, useEffect } from 'react';
-import Webcam from 'react-webcam';
+import { Form } from "./components/Form";
+import { Header } from "./components/Header";
+import { InfoBox } from "./components/InfoBox";
+import { Navbar } from "./components/Navbar";
 
-
-import { Form } from './components/Form';
-import { Header } from './components/Header';
-import { InfoBox } from './components/InfoBox';
-
-
-import './App.css';
+import "./App.css";
 
 interface PageWrapperProps {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }
 
-const PageWrapper: React.FC<PageWrapperProps> = ({ children }: PageWrapperProps) => {
-	return (
-		<div style={{ overflowX: 'hidden' }}>
-			<Navbar />
-			{children}
-			<Footer />
-		</div>
-	);
+const PageWrapper: React.FC<PageWrapperProps> = ({
+  children,
+}: PageWrapperProps) => {
+  return (
+    <div style={{ overflowX: "hidden" }}>
+      <Navbar />
+      {children}
+      <Footer />
+    </div>
+  );
 };
 
 function App() {
-  const [ imgSrc, setImgSrc ] = useState("");
-  const webcamRef = React.useRef(null);
+  // one pixel image url xd
+  const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
 
   const [devices, setDevices] = useState([]);
   const [interval, setInterval] = useState(90);
 
-  const capture = React.useCallback(
-    () => {
-      const ref = webcamRef.current as any
-      const imageSrc = ref.getScreenshot();
-      setImgSrc(imageSrc);
-      // detectLandmarks - if returns undefined then popup error else continue
-      // drawFeatures - show canvas as well
-      // setInterval
-    },
-    [webcamRef]
-  );
-
+  const webcamRef = React.useRef(null);
+  const capture = React.useCallback(() => {
+    const ref = webcamRef.current as any;
+    const imageSrc = ref.getScreenshot();
+    setImgSrc(imageSrc);
+    // detectLandmarks - if returns undefined then popup error else continue
+    // drawFeatures - show canvas as well
+    // setInterval
+    /*
+			console.log(
+				await testFunction(
+					document.getElementById("capture") as HTMLImageElement
+				)
+			)
+			*/
+  }, [webcamRef]);
 
   const handleDevices = React.useCallback(
     mediaDevices => {
@@ -61,29 +64,39 @@ function App() {
     [handleDevices]
   );
 
+  useEffect(() => {
+    //loadModels();
+  }, []);
 
-	return (
-		<div className="container">
-			<VStack className="column">
-				<Header />
-				<InfoBox />
-				<Webcam audio={false} height={200} ref={webcamRef} screenshotFormat="image/png" width={500} />
-				<Form capture={capture} devices={devices} setInterval={setInterval} interval={interval} />
-				{imgSrc && <img src={imgSrc} alt="capture" />}
-			</VStack>
-		</div>
-	);
+  return (
+    <div className="container">
+      <VStack className="column">
+        <Header />
+        <InfoBox />
+        <Webcam
+          audio={false}
+          height={200}
+          ref={webcamRef}
+          screenshotFormat="image/png"
+          width={500}
+        />
+        <Form capture={capture} devices={devices} setInterval={setInterval} interval={interval} />
+        <img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous" />
+        <canvas id="overlay" />
+      </VStack>
+    </div>
+  );
 
 }
 
 function ConnectedApp() {
-	return (
-		<ChakraProvider>
-			<PageWrapper>
-				<App />
-			</PageWrapper>
-		</ChakraProvider>
-	);
+  return (
+    <ChakraProvider>
+      <PageWrapper>
+        <App />
+      </PageWrapper>
+    </ChakraProvider>
+  );
 }
 
 export default ConnectedApp;
