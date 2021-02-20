@@ -53,7 +53,7 @@ function App() {
     faceapi.FaceLandmarks68
   > | null>(null);
   const webcamRef = useRef(null);
-  const [play] = useSound(notification, {volume: 0.75});
+  const [play] = useSound(notification, { volume: 0.1 });
   const [webcamId, setwebcamId] = useState("");
 
   useEffect(() => {
@@ -72,6 +72,7 @@ function App() {
   };
 
   const displayErrorToast = (message: string) => {
+    play();
     toast({
       position: "bottom-left",
       title: "An error occurred.",
@@ -82,17 +83,12 @@ function App() {
     });
   };
 
-  const notifyerror = () => {
-    play();
-  }
-
   const verifyPosture = async (img: HTMLImageElement) => {
     console.log(oldLandmarks);
     if (oldLandmarks) {
       const hasBadPosture = await isBadPosture(oldLandmarks, img);
       console.log(hasBadPosture);
       if (hasBadPosture) {
-        notifyerror();
         displayErrorToast("Your posture requires correction!");
       } else {
         displaySuccessToast("Good job!");
@@ -100,10 +96,9 @@ function App() {
     }
   };
 
-
   const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
-    const imageSrc = ref.getScreenshot();
+    const imageSrc = await ref.getScreenshot();
     setImgSrc(imageSrc);
     const img = document.getElementById("capture") as HTMLImageElement;
     const canvas = document.getElementById("overlay") as HTMLCanvasElement;
@@ -114,7 +109,6 @@ function App() {
       setOldLandmarks(landmarks);
     } else {
       displayErrorToast("Unable to detect user.");
-      notifyerror();
     }
     // this is req'd, adding in the dependencies from the warning causes an infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
