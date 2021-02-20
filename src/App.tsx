@@ -32,6 +32,7 @@ function App() {
 
   const [devices, setDevices] = useState([]);
   const [interval, setInterval] = useState(90);
+  const [webcamid, setwebcamid] = useState("");
 
   const webcamRef = React.useRef(null);
   const capture = React.useCallback(() => {
@@ -80,14 +81,17 @@ function App() {
           ref={webcamRef}
           screenshotFormat="image/png"
           width={500}
+          videoConstraints={{deviceId: webcamid}}
         />
         <Form
           capture={capture}
           devices={devices}
           setInterval={setInterval}
           interval={interval}
+          webcamid={webcamid}
+          setwebcamid={setwebcamid}
         />
-        <img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous" />
+        <img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous"/>
         <canvas id="overlay" />
       </VStack>
     </div>
