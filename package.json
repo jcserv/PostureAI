@@ -16,6 +16,7 @@
     "@types/react-dom": "^17.0.0",
     "face-api.js": "^0.22.2",
     "framer-motion": "^3.6.1",
+    "prettier": "^2.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-icons": "^4.2.0",
@@ -28,7 +29,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prettier": "npx prettier --write ."
   },
   "eslintConfig": {
     "extends": [
