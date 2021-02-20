@@ -1,12 +1,13 @@
 import * as faceapi from "face-api.js";
 
-import { absolutePositionCheck } from "./postureChecks";
+import { absolutePositionCheck, proximityCheck } from "./postureChecks";
 
 const MODEL_URL = "./models";
 
 const loadModels = async () => {
   await Promise.all([
-    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+    // faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+    faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models"),
     faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
   ]);
   console.log("Loaded all models");
@@ -14,16 +15,16 @@ const loadModels = async () => {
 
 // Returns null if no face found
 const detectLandmarks = async (
-    input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
+  input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<faceapi.WithFaceLandmarks<
   { detection: faceapi.FaceDetection },
   faceapi.FaceLandmarks68
 > | null> => {
-    const detectionsWithLandmarks = await faceapi
-        .detectSingleFace(input)
-        .withFaceLandmarks();
-    if (detectionsWithLandmarks) return detectionsWithLandmarks;
-    else return null;
+  const detectionsWithLandmarks = await faceapi
+    .detectSingleFace(input)
+    .withFaceLandmarks(true);
+  if (detectionsWithLandmarks) return detectionsWithLandmarks;
+  else return null;
 };
 
 const drawFeatures = (
@@ -56,21 +57,28 @@ const isBadPosture = async (
   >,
   input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<Boolean | null> => {
-    console.log("Initiate posture check")
-    const newDetection = await detectLandmarks(input);
-    //TODO
-    if (!newDetection) {
-        console.log("No face found in posture check")
-        return null
-    }
+  console.log("Initiate posture check");
+  const newDetection = await detectLandmarks(input);
+  //TODO
+  if (!newDetection) {
+    console.log("No face found in posture check");
+    return null;
+  }
 
-  const positionCheck = absolutePositionCheck(
-    input.width,
-    input.height,
-    groundTruthDetection,
-    newDetection
+  return (
+    absolutePositionCheck(
+      input.width,
+      input.height,
+      groundTruthDetection,
+      newDetection
+    ) ||
+    proximityCheck(
+      input.width,
+      input.height,
+      groundTruthDetection,
+      newDetection
+    )
   );
-  return positionCheck;
 };
 
 export { loadModels, detectLandmarks, drawFeatures, isBadPosture };
