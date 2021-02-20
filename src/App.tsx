@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Webcam from 'react-webcam';
 
 import { Footer } from './components/Footer';
+import { Form } from './components/Form';
 import { Header } from './components/Header';
 import { InfoBox } from './components/InfoBox';
 import { Navbar } from './components/Navbar';
@@ -42,6 +43,7 @@ function App() {
 				<InfoBox />
 				<Webcam audio={false} height={200} ref={webcamRef} screenshotFormat="image/png" width={500} />
 				<button onClick={capture}>Capture photo</button>
+				<Form />
 				{imgSrc && <img src={imgSrc} alt="capture" />}
 			</VStack>
 		</div>
