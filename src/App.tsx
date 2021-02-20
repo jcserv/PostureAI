@@ -1,4 +1,4 @@
-import { ChakraProvider, VStack } from "@chakra-ui/react";
+import { ChakraProvider, VStack, useToast } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import Webcam from "react-webcam";
 
@@ -7,7 +7,8 @@ import { Form } from "./components/Form";
 import { Header } from "./components/Header";
 import { InfoBox } from "./components/InfoBox";
 import { Navbar } from "./components/Navbar";
-
+import useSound from "use-sound";
+import notification from "./sounds/notification.mp3";
 import "./App.css";
 
 interface PageWrapperProps {
@@ -32,11 +33,28 @@ function App() {
 
   const [devices, setDevices] = useState([]);
   const [interval, setInterval] = useState(90);
-
+  const [play] = useSound(notification, {volume: 0.75});
+  const toast = useToast();
   const webcamRef = React.useRef(null);
+
+  const setTimer = () => {
+    setTimeout(() => {
+      play();
+      toast({
+        description: "Insert message here",
+        isClosable: true, 
+      })
+    }, interval * 1000);
+  }
+
+  const calibrate = React.useCallback(() => {
+    capture();
+  }, []);
+
   const capture = React.useCallback(() => {
     const ref = webcamRef.current as any;
     const imageSrc = ref.getScreenshot();
+    setTimer();
     setImgSrc(imageSrc);
     // detectLandmarks - if returns undefined then popup error else continue
     // drawFeatures - show canvas as well
@@ -49,6 +67,8 @@ function App() {
 			)
 			*/
   }, [webcamRef]);
+
+
 
   const handleDevices = React.useCallback(
     (mediaDevices) => {
