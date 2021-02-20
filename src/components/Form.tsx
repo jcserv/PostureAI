@@ -59,7 +59,7 @@ export const Form: React.FC<FormProps> = ({
           <FormLabel>Timer</FormLabel>
           <Slider
             aria-label="slider-ex-4"
-            min={60}
+            min={1}
             max={120}
             value={sliderVal}
             onChange={(val) => setSliderVal(val)}
