@@ -14,28 +14,16 @@ const loadModels = async () => {
 
 // Returns null if no face found
 const detectLandmarks = async (
-<<<<<<< HEAD
-  image: HTMLImageElement
-=======
     input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
->>>>>>> main
 ): Promise<faceapi.WithFaceLandmarks<
   { detection: faceapi.FaceDetection },
   faceapi.FaceLandmarks68
 > | null> => {
-<<<<<<< HEAD
-  const detectionsWithLandmarks = await faceapi
-    .detectSingleFace(image)
-    .withFaceLandmarks();
-  if (detectionsWithLandmarks) return detectionsWithLandmarks;
-  else return null;
-=======
     const detectionsWithLandmarks = await faceapi
         .detectSingleFace(input)
         .withFaceLandmarks();
     if (detectionsWithLandmarks) return detectionsWithLandmarks;
     else return null;
->>>>>>> main
 };
 
 const drawFeatures = (
