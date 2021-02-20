@@ -14,7 +14,7 @@ export const Footer = (): JSX.Element => {
 			<Text fontSize="sm">
 				Made with{' '}
 				<span aria-label="heart" role="img">
-					&#128153;
+					&#128156;
 				</span>{' '}
 				by{' '}
 				<Link href="https://ca.linkedin.com/in/shahmeer-shahid" isExternal>
