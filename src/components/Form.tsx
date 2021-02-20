@@ -17,7 +17,7 @@ import { TimeIcon } from "@chakra-ui/icons";
 import React, { useState, useEffect } from "react";
 interface FormProps {
   devices: InputDeviceInfo[];
-  capture: () => void;
+  calibrate: () => void;
   setInterval: React.Dispatch<React.SetStateAction<number>>;
   interval: number;
   webcamId: string;
@@ -26,7 +26,7 @@ interface FormProps {
 
 export const Form: React.FC<FormProps> = ({
   devices,
-  capture,
+  calibrate,
   setInterval,
   interval,
   webcamId,
@@ -82,7 +82,7 @@ export const Form: React.FC<FormProps> = ({
           <Button
             onClick={() => {
               setInterval(sliderVal);
-              capture();
+              calibrate();
             }}
           >
             Calibrate

@@ -24,6 +24,7 @@ import { Navbar } from "./components/Navbar";
 import useSound from "use-sound";
 import notification from "./sounds/notification.mp3";
 import "./App.css";
+import { verify } from "crypto";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -48,7 +49,10 @@ function App() {
   const [hasPermissions, setHasPermissions] = useState(true);
   const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
   const [intervalTime, setIntervalTime] = useState(90);
-  const [oldLandmarks, setOldLandmarks] = useState<faceapi.WithFaceLandmarks<
+  const [
+    calibratedLandmarks,
+    setCalibratedLandmarks,
+  ] = useState<faceapi.WithFaceLandmarks<
     { detection: faceapi.FaceDetection },
     faceapi.FaceLandmarks68
   > | null>(null);
@@ -84,10 +88,8 @@ function App() {
   };
 
   const verifyPosture = async (img: HTMLImageElement) => {
-    console.log(oldLandmarks);
-    if (oldLandmarks) {
-      const hasBadPosture = await isBadPosture(oldLandmarks, img);
-      console.log(hasBadPosture);
+    if (calibratedLandmarks) {
+      const hasBadPosture = await isBadPosture(calibratedLandmarks, img);
       if (hasBadPosture) {
         displayErrorToast("Your posture requires correction!");
       } else {
@@ -96,31 +98,52 @@ function App() {
     }
   };
 
+  const drawFaceMesh = (
+    landmarks: faceapi.WithFaceLandmarks<
+      { detection: faceapi.FaceDetection },
+      faceapi.FaceLandmarks68
+    >,
+    callback: (img: HTMLImageElement) => void
+  ) => {
+    const img = document.getElementById("capture") as HTMLImageElement;
+    const canvas = document.getElementById("overlay") as HTMLCanvasElement;
+    drawFeatures(landmarks, canvas, img);
+    if (callback) callback(img);
+  };
+
+  const calibrate = async () => {
+    const landmarks = await capture();
+    if (landmarks) {
+      drawFaceMesh(landmarks, () => {});
+      setCalibratedLandmarks(landmarks);
+    } else {
+      displayErrorToast("Unable to detect user.");
+    }
+  };
+
   const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
     const imageSrc = await ref.getScreenshot();
     setImgSrc(imageSrc);
     const img = document.getElementById("capture") as HTMLImageElement;
-    const canvas = document.getElementById("overlay") as HTMLCanvasElement;
-    const landmarks = await detectLandmarks(img);
-    if (landmarks) {
-      drawFeatures(landmarks, canvas, img);
-      verifyPosture(img);
-      setOldLandmarks(landmarks);
-    } else {
-      displayErrorToast("Unable to detect user.");
-    }
-    // this is req'd, adding in the dependencies from the warning causes an infinite loop
+    return await detectLandmarks(img);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [webcamRef]);
 
   useEffect(() => {
     // Capture user based on interval set
-    const timer = setInterval(() => {
-      capture();
+    const timer = setInterval(async () => {
+      if (!calibratedLandmarks) return;
+      const newLandmarks = await capture();
+      if (newLandmarks) {
+        drawFaceMesh(newLandmarks, verifyPosture);
+      } else {
+        displayErrorToast("Unable to detect user.");
+      }
     }, 5 * 1000);
     return () => clearInterval(timer);
-  }, [capture, intervalTime]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calibratedLandmarks, capture, intervalTime]);
 
   const handleDevices = React.useCallback(
     (mediaDevices) => {
@@ -162,7 +185,7 @@ function App() {
           </>
         )}
         <Form
-          capture={capture}
+          calibrate={calibrate}
           devices={devices}
           setInterval={setIntervalTime}
           interval={intervalTime}
