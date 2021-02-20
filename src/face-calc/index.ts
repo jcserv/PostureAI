@@ -5,25 +5,37 @@ import {absolutePositionCheck} from "./postureChecks"
 const MODEL_URL = "./models";
 
 const loadModels = async () => {
-    await Promise.all([
-        faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-        faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-    ]);
-    console.log("Loaded all models");
+  await Promise.all([
+    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+  ]);
+  console.log("Loaded all models");
 };
 
 // Returns null if no face found
 const detectLandmarks = async (
+<<<<<<< HEAD
+  image: HTMLImageElement
+=======
     input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
+>>>>>>> main
 ): Promise<faceapi.WithFaceLandmarks<
-    { detection: faceapi.FaceDetection },
-    faceapi.FaceLandmarks68
+  { detection: faceapi.FaceDetection },
+  faceapi.FaceLandmarks68
 > | null> => {
+<<<<<<< HEAD
+  const detectionsWithLandmarks = await faceapi
+    .detectSingleFace(image)
+    .withFaceLandmarks();
+  if (detectionsWithLandmarks) return detectionsWithLandmarks;
+  else return null;
+=======
     const detectionsWithLandmarks = await faceapi
         .detectSingleFace(input)
         .withFaceLandmarks();
     if (detectionsWithLandmarks) return detectionsWithLandmarks;
     else return null;
+>>>>>>> main
 };
 
 const drawFeatures = (
@@ -65,9 +77,4 @@ const isBadPosture = async (
     return positionCheck;
 };
 
-export {
-    loadModels,
-    detectLandmarks,
-    drawFeatures,
-    isBadPosture,
-};
+export { loadModels, detectLandmarks, drawFeatures, isBadPosture };

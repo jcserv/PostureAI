@@ -4,9 +4,9 @@ export const InfoBox = (): JSX.Element => {
   return (
     <VStack p={5} shadow="md" borderWidth="1px" m={4}>
       <Text opacity={0.8} fontSize={{ base: "lg", lg: "xl" }}>
-        <Text as="strong">UofT</Text>
+        <Text as="strong">posture</Text>
         <Text as="strong" color={useColorModeValue("purple.500", "purple.300")}>
-          Hacks
+          .ai
         </Text>{" "}
         analyzes your posture & notifies you in real-time!
       </Text>
