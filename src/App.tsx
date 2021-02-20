@@ -1,6 +1,27 @@
+import { ChakraProvider } from "@chakra-ui/react";
 import React, { useState } from 'react';
 import Webcam from "react-webcam";
+
+import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
+
 import './App.css';
+
+interface PageWrapperProps {
+  children: React.ReactNode;
+}
+
+const PageWrapper: React.FC<PageWrapperProps> = ({
+  children,
+}: PageWrapperProps) => {
+  return (
+    <div style={{ overflowX: "hidden" }}>
+      <Navbar />
+      {children}
+      <Footer />
+    </div>
+  );
+}
 
 function App() {
   const [ imgSrc, setImgSrc ] = useState("");
@@ -15,8 +36,7 @@ function App() {
   );
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="container">
       <Webcam
         audio={false}
         height={720}
@@ -26,9 +46,18 @@ function App() {
       />
       <button onClick={capture}>Capture photo</button>
       {imgSrc && <img src={imgSrc} alt="capture"/>}
-      </header>
     </div>
   );
 }
 
-export default App;
+function ConnectedApp() {
+  return (
+    <ChakraProvider>
+      <PageWrapper>
+      <App/>
+      </PageWrapper>
+    </ChakraProvider>
+  )
+}
+
+export default ConnectedApp;
