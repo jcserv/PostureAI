@@ -20,8 +20,8 @@ interface FormProps {
   capture: () => void;
   setInterval: React.Dispatch<React.SetStateAction<number>>;
   interval: number;
-  webcamid: string;
-  setwebcamid: React.Dispatch<React.SetStateAction<string>>;
+  webcamId: string;
+  setwebcamId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 
@@ -30,14 +30,14 @@ export const Form: React.FC<FormProps> = ({
   capture,
   setInterval,
   interval,
-  webcamid,
-  setwebcamid
+  webcamId,
+  setwebcamId
 }): JSX.Element => {
 
   
   useEffect(() => {
 		if(devices.length > 0) {
-			setwebcamid(devices[0].deviceId);
+			setwebcamId(devices[0].deviceId);
 		}
   }, [devices]);
 
@@ -46,7 +46,7 @@ export const Form: React.FC<FormProps> = ({
       <VStack spacing={4} p={5} shadow="md" borderWidth="1px" m={4}>
         <FormControl id="selectdevice" w="100%">
           <FormLabel>Webcam</FormLabel>
-          <Select value={webcamid} onChange={e => setwebcamid(e.currentTarget.value)}>
+          <Select value={webcamId} onChange={e => setwebcamId(e.currentTarget.value)}>
             {devices.map((device, key) => <option key={device.label} value={device.deviceId}>{device.label}</option>)}
           </Select>
         </FormControl>
