@@ -9,7 +9,8 @@ const IndexPage = () => {
 	const capture = React.useCallback(
 		() => {
 			// pain.
-			const imageSrc = webcamRef.current.getScreenshot;
+			const ref = webcamRef.current as any;
+			const imageSrc = ref.getScreenshot;
 			setImgSrc(imageSrc);
 		},
 		[ webcamRef, setImgSrc ]
