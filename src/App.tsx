@@ -1,5 +1,5 @@
 import { ChakraProvider, VStack } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Webcam from 'react-webcam';
 
 import { Footer } from './components/Footer';
@@ -25,16 +25,28 @@ const PageWrapper: React.FC<PageWrapperProps> = ({ children }: PageWrapperProps)
 };
 
 function App() {
-	const [ imgSrc, setImgSrc ] = useState('');
+	// one pixel image url xd
+	const [ imgSrc, setImgSrc ] = useState('https://i.imgur.com/AnRSQSq.png');
 	const webcamRef = React.useRef(null);
 	const capture = React.useCallback(
 		() => {
 			const ref = webcamRef.current as any;
 			const imageSrc = ref.getScreenshot();
 			setImgSrc(imageSrc);
+			/*
+			console.log(
+				await testFunction(
+					document.getElementById("capture") as HTMLImageElement
+				)
+			)
+			*/
 		},
 		[ webcamRef ]
 	);
+
+	useEffect(() => {
+		//loadModels();
+	}, []);
 
 	return (
 		<div className="container">
@@ -42,9 +54,10 @@ function App() {
 				<Header />
 				<InfoBox />
 				<Webcam audio={false} height={200} ref={webcamRef} screenshotFormat="image/png" width={500} />
+				<canvas id="overlay" />
 				<button onClick={capture}>Capture photo</button>
 				<Form />
-				{imgSrc && <img src={imgSrc} alt="capture" />}
+				<img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous" />
 			</VStack>
 		</div>
 	);
