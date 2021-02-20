@@ -51,18 +51,19 @@ function App() {
   }, [webcamRef]);
 
   const handleDevices = React.useCallback(
-    mediaDevices => {
-        setDevices(mediaDevices.filter((device:InputDeviceInfo) => device.kind === "videoinput"))
-     } ,
+    (mediaDevices) => {
+      setDevices(
+        mediaDevices.filter(
+          (device: InputDeviceInfo) => device.kind === "videoinput"
+        )
+      );
+    },
     [setDevices]
   );
 
-  useEffect(
-    () => {
-      navigator.mediaDevices.enumerateDevices().then(handleDevices);
-    },
-    [handleDevices]
-  );
+  useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then(handleDevices);
+  }, [handleDevices]);
 
   useEffect(() => {
     //loadModels();
@@ -80,13 +81,17 @@ function App() {
           screenshotFormat="image/png"
           width={500}
         />
-        <Form capture={capture} devices={devices} setInterval={setInterval} interval={interval} />
+        <Form
+          capture={capture}
+          devices={devices}
+          setInterval={setInterval}
+          interval={interval}
+        />
         <img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous" />
         <canvas id="overlay" />
       </VStack>
     </div>
   );
-
 }
 
 function ConnectedApp() {
