@@ -28,7 +28,6 @@ export const Form: React.FC<FormProps> = ({
   setInterval,
   interval,
 }): JSX.Element => {
-
   const [sliderVal, setSliderVal] = useState(interval);
 
   return (
@@ -66,10 +65,14 @@ export const Form: React.FC<FormProps> = ({
           </FormHelperText>
         </FormControl>
         <Center>
-          <Button onClick={() => { 
-            setInterval(sliderVal);
-            capture();
-          }}>Calibrate</Button>
+          <Button
+            onClick={() => {
+              setInterval(sliderVal);
+              capture();
+            }}
+          >
+            Calibrate
+          </Button>
         </Center>
       </VStack>
     </form>
