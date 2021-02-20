@@ -1,5 +1,7 @@
 import * as faceapi from "face-api.js";
 
+import {absolutePositionCheck} from "./postureChecks"
+
 const MODEL_URL = "./models";
 
 const loadModels = async () => {
@@ -12,51 +14,55 @@ const loadModels = async () => {
 
 // Returns null if no face found
 const detectLandmarks = async (
-    image: HTMLImageElement
+    input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<faceapi.WithFaceLandmarks<
     { detection: faceapi.FaceDetection },
     faceapi.FaceLandmarks68
 > | null> => {
     const detectionsWithLandmarks = await faceapi
-        .detectSingleFace(image)
+        .detectSingleFace(input)
         .withFaceLandmarks();
     if (detectionsWithLandmarks) return detectionsWithLandmarks;
     else return null;
 };
 
 const drawFeatures = (
-    detections: faceapi.WithFaceLandmarks<
-        { detection: faceapi.FaceDetection },
-        faceapi.FaceLandmarks68
-    >,
-    canvas: HTMLCanvasElement,
-    imageElement: HTMLImageElement
+  detections: faceapi.WithFaceLandmarks<
+    { detection: faceapi.FaceDetection },
+    faceapi.FaceLandmarks68
+  >,
+  canvas: HTMLCanvasElement,
+  input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): void => {
-    const displaySize = {
-        width: imageElement.width,
-        height: imageElement.height,
-    };
-    faceapi.matchDimensions(canvas, displaySize);
+  const displaySize = {
+    width: input.width,
+    height: input.height,
+  };
+  faceapi.matchDimensions(canvas, displaySize);
 
-    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+  const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
-    if (resizedDetections) {
-        console.log("im drawing");
-        faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-    }
+  if (resizedDetections) {
+    console.log("im drawing");
+    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+  }
 };
 
 // returns null if no face found
 const isBadPosture = async (
-    oldLandmarks: faceapi.WithFaceLandmarks<
+    groundTruthDetection: faceapi.WithFaceLandmarks<
         { detection: faceapi.FaceDetection },
         faceapi.FaceLandmarks68
     >,
-    newImage: HTMLImageElement
+    input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<Boolean | null> => {
-    const newLandmarks = await detectLandmarks(newImage);
+    const newDetection = await detectLandmarks(input);
     //TODO
-    return false;
+    if (!newDetection)
+        return null
+
+    const positionCheck = absolutePositionCheck(input.width, input.height, groundTruthDetection, newDetection)
+    return positionCheck;
 };
 
 export {
