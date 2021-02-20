@@ -5,19 +5,19 @@ import {absolutePositionCheck} from "./postureChecks"
 const MODEL_URL = "./models";
 
 const loadModels = async () => {
-    await Promise.all([
-        faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-        faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-    ]);
-    console.log("Loaded all models");
+  await Promise.all([
+    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+  ]);
+  console.log("Loaded all models");
 };
 
 // Returns null if no face found
 const detectLandmarks = async (
     input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<faceapi.WithFaceLandmarks<
-    { detection: faceapi.FaceDetection },
-    faceapi.FaceLandmarks68
+  { detection: faceapi.FaceDetection },
+  faceapi.FaceLandmarks68
 > | null> => {
     const detectionsWithLandmarks = await faceapi
         .detectSingleFace(input)
@@ -65,9 +65,4 @@ const isBadPosture = async (
     return positionCheck;
 };
 
-export {
-    loadModels,
-    detectLandmarks,
-    drawFeatures,
-    isBadPosture,
-};
+export { loadModels, detectLandmarks, drawFeatures, isBadPosture };
