@@ -1,6 +1,13 @@
-import { ChakraProvider, VStack, useToast } from "@chakra-ui/react";
+import {
+  ChakraProvider,
+  VStack,
+  useToast,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
+import * as faceapi from "face-api.js";
 
 import {
   detectLandmarks,
@@ -37,13 +44,58 @@ function App() {
   const toast = useToast();
   // one pixel image url xd
   const [devices, setDevices] = useState([]);
+  const [hasPermissions, setHasPermissions] = useState(true);
   const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
   const [intervalTime, setIntervalTime] = useState(90);
+  const [oldLandmarks, setOldLandmarks] = useState<faceapi.WithFaceLandmarks<
+    { detection: faceapi.FaceDetection },
+    faceapi.FaceLandmarks68
+  > | null>(null);
   const webcamRef = useRef(null);
 
   useEffect(() => {
     loadModels();
   }, []);
+
+  const displaySuccessToast = (message: string) => {
+    toast({
+      position: "bottom-left",
+      title: "Your posture looks great!",
+      description: message,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+  const displayErrorToast = (message: string) => {
+    toast({
+      position: "bottom-left",
+      title: "An error occurred.",
+      description: message,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+  const verifyPosture = async (
+    img: HTMLImageElement,
+    landmarks: faceapi.WithFaceLandmarks<
+      { detection: faceapi.FaceDetection },
+      faceapi.FaceLandmarks68
+    >
+  ) => {
+    if (oldLandmarks) {
+      const hasBadPosture = await isBadPosture(oldLandmarks, img);
+      if (hasBadPosture) {
+        displayErrorToast("Your posture requires correction!");
+      } else {
+        displaySuccessToast("Good job!");
+      }
+    }
+    setOldLandmarks(landmarks);
+  };
 
   const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
@@ -54,17 +106,13 @@ function App() {
     const landmarks = await detectLandmarks(img);
     if (landmarks) {
       drawFeatures(landmarks, canvas, img);
+      verifyPosture(img, landmarks);
     } else {
-      toast({
-        position: "bottom-left",
-        title: "An error occurred.",
-        description: "Unable to detect user.",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
+      displayErrorToast("Unable to detect user.");
     }
-  }, [toast, webcamRef]);
+    // this is req'd, adding in the dependencies from the warning causes an infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [webcamRef]);
 
   useEffect(() => {
     // Capture user based on interval set
@@ -94,21 +142,43 @@ function App() {
       <VStack className="column">
         <Header />
         <InfoBox />
-        <Webcam
-          audio={false}
-          height={200}
-          ref={webcamRef}
-          screenshotFormat="image/png"
-          width={500}
-        />
+        {hasPermissions ? (
+          <Webcam
+            audio={false}
+            height={200}
+            ref={webcamRef}
+            screenshotFormat="image/png"
+            width={500}
+            onUserMediaError={() => {
+              setHasPermissions(false);
+              displayErrorToast("Permissions not provided");
+            }}
+          />
+        ) : (
+          <>
+            <Spinner size="xl" />
+            <Text>Please enable webcam access and refresh the page.</Text>
+          </>
+        )}
+
         <Form
           capture={capture}
           devices={devices}
           setInterval={setIntervalTime}
           interval={intervalTime}
         />
-        <img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous" />
-        <canvas id="overlay" />
+        <div className="outsideWrapper">
+          <div className="insideWrapper">
+            <img
+              src={imgSrc}
+              alt="capture"
+              id="capture"
+              crossOrigin="anonymous"
+              className="coveredImage"
+            />
+            <canvas id="overlay" className="coveringCanvas" />
+          </div>
+        </div>
       </VStack>
     </div>
   );

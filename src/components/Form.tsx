@@ -14,7 +14,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { TimeIcon } from "@chakra-ui/icons";
-import React from "react";
+import React, { useState } from "react";
 interface FormProps {
   devices: InputDeviceInfo[];
   capture: () => void;
@@ -28,6 +28,9 @@ export const Form: React.FC<FormProps> = ({
   setInterval,
   interval,
 }): JSX.Element => {
+
+  const [sliderVal, setSliderVal] = useState(interval);
+
   return (
     <form style={{ width: "100%" }}>
       <VStack spacing={4} p={5} shadow="md" borderWidth="1px" m={4}>
@@ -45,8 +48,8 @@ export const Form: React.FC<FormProps> = ({
             aria-label="slider-ex-4"
             min={60}
             max={120}
-            value={interval}
-            onChange={(val) => setInterval(val)}
+            value={sliderVal}
+            onChange={(val) => setSliderVal(val)}
           >
             <SliderTrack bg="red.100">
               <SliderFilledTrack bg="tomato" />
@@ -56,14 +59,17 @@ export const Form: React.FC<FormProps> = ({
             </SliderThumb>
           </Slider>
           <Center>
-            <Text>{interval} seconds</Text>
+            <Text>{sliderVal} seconds</Text>
           </Center>
           <FormHelperText>
             Select how frequently you want us to check your posture!
           </FormHelperText>
         </FormControl>
         <Center>
-          <Button onClick={() => capture()}>Calibrate</Button>
+          <Button onClick={() => { 
+            setInterval(sliderVal);
+            capture();
+          }}>Calibrate</Button>
         </Center>
       </VStack>
     </form>
