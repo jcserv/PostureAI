@@ -1,11 +1,11 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Webcam from "react-webcam";
 
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
-
-import './App.css';
+import { Devicedropdown } from "./components/Devicedropdown";
+import { Calibration } from "./components/CalibrateButton";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -26,6 +26,10 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
 function App() {
   const [ imgSrc, setImgSrc ] = useState("");
   const webcamRef = React.useRef(null);
+
+  const [devices, setDevices] = useState([]);
+
+
   const capture = React.useCallback(
     () => {
       const ref = webcamRef.current as any
@@ -33,6 +37,20 @@ function App() {
       setImgSrc(imageSrc);
     },
     [webcamRef]
+  );
+
+  const handleDevices = React.useCallback(
+    mediaDevices => {
+        setDevices(mediaDevices.filter((device:InputDeviceInfo) => device.kind === "videoinput"))
+     } ,
+    [setDevices]
+);
+
+  useEffect(
+    () => {
+      navigator.mediaDevices.enumerateDevices().then(handleDevices);
+    },
+    [handleDevices]
   );
 
   return (
@@ -44,6 +62,8 @@ function App() {
         screenshotFormat="image/png"
         width={1280}
       />
+      <Devicedropdown devices={devices} />
+      <Calibration handler={capture} />
       <button onClick={capture}>Capture photo</button>
       {imgSrc && <img src={imgSrc} alt="capture"/>}
     </div>
