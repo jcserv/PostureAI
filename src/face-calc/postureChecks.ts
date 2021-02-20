@@ -1,6 +1,6 @@
 import * as faceapi from "face-api.js";
 //import * as math from "mathjs"
-const LIMIT = 0.075;
+const LIMIT = 0.01;
 // Returns true if check fails ie bad posture
 const absolutePositionCheck = (
   imageWidth: number,
@@ -91,7 +91,11 @@ const forwardTiltCheck = (
     getAverageLandmark(newRightEye)
   );
 
-  return true;
+  const percentageChange =
+    Math.abs(newDistance - groundTruthDistance) / groundTruthDistance;
+  console.log("Forward tilt check results:", {percentageChange, changeLimit : LIMIT});
+
+  return percentageChange > LIMIT;
 };
 
 const sideTiltCheck = (
@@ -144,4 +148,4 @@ const getLimit = (width: number, height: number): number => {
   return getDiagonalLength(width, height) * 0.075;
 };
 
-export { absolutePositionCheck, proximityCheck };
+export { absolutePositionCheck, proximityCheck, forwardTiltCheck };

@@ -1,6 +1,6 @@
 import * as faceapi from "face-api.js";
 
-import { absolutePositionCheck, proximityCheck } from "./postureChecks";
+import { absolutePositionCheck, proximityCheck, forwardTiltCheck } from "./postureChecks";
 
 const MODEL_URL = "./models";
 
@@ -55,7 +55,8 @@ const isBadPosture = async (
     { detection: faceapi.FaceDetection },
     faceapi.FaceLandmarks68
   >,
-  input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
+  input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement,
+  sensitivity : number = 5
 ): Promise<Boolean | null> => {
   console.log("Initiate posture check");
   const newDetection = await detectLandmarks(input);
@@ -77,7 +78,14 @@ const isBadPosture = async (
       input.height,
       groundTruthDetection,
       newDetection
+    ) ||
+    forwardTiltCheck(
+        input.width,
+        input.height,
+        groundTruthDetection,
+        newDetection
     )
+
   );
 };
 
