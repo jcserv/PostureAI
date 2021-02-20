@@ -11,8 +11,9 @@ export const InfoBox = (): JSX.Element => {
         analyzes your posture & notifies you in real-time!
       </Text>
       <Text opacity={0.8} fontSize={{ base: "lg", lg: "xl" }} mt="6">
-        Click calibrate, select your time, lorem ipsum lorem ipsum, lorem ipsum,
-        lorem ipsum, lorem ipsum
+        Get into an ergonomic position, click calibrate, set your timer, and get
+        cracking! posture.ai will notify you if your posture changes negatively,
+        allowing you to correct it quickly.
       </Text>
     </VStack>
   );
