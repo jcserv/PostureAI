@@ -24,20 +24,19 @@ interface FormProps {
   setwebcamId: React.Dispatch<React.SetStateAction<string>>;
 }
 
-
 export const Form: React.FC<FormProps> = ({
   devices,
   capture,
   setInterval,
   interval,
   webcamId,
-  setwebcamId
+  setwebcamId,
 }): JSX.Element => {
   const [sliderVal, setSliderVal] = useState(interval);
   useEffect(() => {
-		if(devices.length > 0) {
-			setwebcamId(devices[0].deviceId);
-		}
+    if (devices.length > 0) {
+      setwebcamId(devices[0].deviceId);
+    }
   }, [devices]);
 
   return (
@@ -45,8 +44,15 @@ export const Form: React.FC<FormProps> = ({
       <VStack spacing={4} p={5} shadow="md" borderWidth="1px" m={4}>
         <FormControl id="selectdevice" w="100%">
           <FormLabel>Webcam</FormLabel>
-          <Select value={webcamId} onChange={e => setwebcamId(e.currentTarget.value)}>
-            {devices.map((device, key) => <option key={device.label} value={device.deviceId}>{device.label}</option>)}
+          <Select
+            value={webcamId}
+            onChange={(e) => setwebcamId(e.currentTarget.value)}
+          >
+            {devices.map((device, key) => (
+              <option key={device.label} value={device.deviceId}>
+                {device.label}
+              </option>
+            ))}
           </Select>
         </FormControl>
         <FormControl id="interval" w="100%">

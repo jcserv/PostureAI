@@ -80,24 +80,18 @@ function App() {
     });
   };
 
-  const verifyPosture = async (
-    img: HTMLImageElement,
-    landmarks: faceapi.WithFaceLandmarks<
-      { detection: faceapi.FaceDetection },
-      faceapi.FaceLandmarks68
-    >
-  ) => {
+  const verifyPosture = async (img: HTMLImageElement) => {
+    console.log(oldLandmarks);
     if (oldLandmarks) {
       const hasBadPosture = await isBadPosture(oldLandmarks, img);
+      console.log(hasBadPosture);
       if (hasBadPosture) {
         displayErrorToast("Your posture requires correction!");
       } else {
         displaySuccessToast("Good job!");
       }
     }
-    setOldLandmarks(landmarks);
   };
-
 
   const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
@@ -108,7 +102,8 @@ function App() {
     const landmarks = await detectLandmarks(img);
     if (landmarks) {
       drawFeatures(landmarks, canvas, img);
-      verifyPosture(img, landmarks);
+      verifyPosture(img);
+      setOldLandmarks(landmarks);
     } else {
       displayErrorToast("Unable to detect user.");
     }
@@ -120,7 +115,7 @@ function App() {
     // Capture user based on interval set
     const timer = setInterval(() => {
       capture();
-    }, intervalTime * 1000);
+    }, 5 * 1000);
     return () => clearInterval(timer);
   }, [capture, intervalTime]);
 
@@ -151,7 +146,7 @@ function App() {
             ref={webcamRef}
             screenshotFormat="image/png"
             width={500}
-            videoConstraints={{deviceId: webcamId}}
+            videoConstraints={{ deviceId: webcamId }}
             onUserMediaError={() => {
               setHasPermissions(false);
               displayErrorToast("Permissions not provided");
