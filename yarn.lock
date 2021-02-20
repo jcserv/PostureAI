@@ -1279,9 +1279,9 @@
     "@chakra-ui/utils" "1.2.0"
 
 "@chakra-ui/icons@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@chakra-ui/icons/-/icons-1.0.5.tgz#21eee12b9ab12da0430c62ea99e6081a6cec7b14"
-  integrity sha512-l8CgisPAS44ehKLw/hoHI6dfSX7pOAfylv8QkINVPEzhHwnNIg0wHzcm1cGkRXuq3DN8G0z88KmFegFFp02yiA==
+  "integrity" "sha512-l8CgisPAS44ehKLw/hoHI6dfSX7pOAfylv8QkINVPEzhHwnNIg0wHzcm1cGkRXuq3DN8G0z88KmFegFFp02yiA=="
+  "resolved" "https://registry.npmjs.org/@chakra-ui/icons/-/icons-1.0.5.tgz"
+  "version" "1.0.5"
   dependencies:
     "@chakra-ui/icon" "1.1.1"
     "@types/react" "^17.0.0"
