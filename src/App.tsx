@@ -29,11 +29,18 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
 function App() {
   // one pixel image url xd
   const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
+
+  const [devices, setDevices] = useState([]);
+  const [interval, setInterval] = useState(90);
+
   const webcamRef = React.useRef(null);
   const capture = React.useCallback(() => {
     const ref = webcamRef.current as any;
     const imageSrc = ref.getScreenshot();
     setImgSrc(imageSrc);
+    // detectLandmarks - if returns undefined then popup error else continue
+    // drawFeatures - show canvas as well
+    // setInterval
     /*
 			console.log(
 				await testFunction(
@@ -42,6 +49,21 @@ function App() {
 			)
 			*/
   }, [webcamRef]);
+
+  const handleDevices = React.useCallback(
+    (mediaDevices) => {
+      setDevices(
+        mediaDevices.filter(
+          (device: InputDeviceInfo) => device.kind === "videoinput"
+        )
+      );
+    },
+    [setDevices]
+  );
+
+  useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then(handleDevices);
+  }, [handleDevices]);
 
   useEffect(() => {
     //loadModels();
@@ -59,10 +81,14 @@ function App() {
           screenshotFormat="image/png"
           width={500}
         />
-        <canvas id="overlay" />
-        <button onClick={capture}>Capture photo</button>
-        <Form />
+        <Form
+          capture={capture}
+          devices={devices}
+          setInterval={setInterval}
+          interval={interval}
+        />
         <img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous" />
+        <canvas id="overlay" />
       </VStack>
     </div>
   );
