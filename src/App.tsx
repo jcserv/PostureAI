@@ -21,7 +21,8 @@ import { Form } from "./components/Form";
 import { Header } from "./components/Header";
 import { InfoBox } from "./components/InfoBox";
 import { Navbar } from "./components/Navbar";
-
+import useSound from "use-sound";
+import notification from "./sounds/notification.mp3";
 import "./App.css";
 
 interface PageWrapperProps {
@@ -52,6 +53,7 @@ function App() {
     faceapi.FaceLandmarks68
   > | null>(null);
   const webcamRef = useRef(null);
+  const [play] = useSound(notification, { volume: 0.1 });
   const [webcamId, setwebcamId] = useState("");
 
   useEffect(() => {
@@ -70,6 +72,7 @@ function App() {
   };
 
   const displayErrorToast = (message: string) => {
+    play();
     toast({
       position: "bottom-left",
       title: "An error occurred.",
@@ -95,7 +98,7 @@ function App() {
 
   const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
-    const imageSrc = ref.getScreenshot();
+    const imageSrc = await ref.getScreenshot();
     setImgSrc(imageSrc);
     const img = document.getElementById("capture") as HTMLImageElement;
     const canvas = document.getElementById("overlay") as HTMLCanvasElement;
