@@ -49,6 +49,7 @@ function App() {
   const [hasPermissions, setHasPermissions] = useState(true);
   const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
   const [intervalTime, setIntervalTime] = useState(90);
+  const [sensitivity, setSensitivity] = useState(5);
   const [
     calibratedLandmarks,
     setCalibratedLandmarks,
@@ -214,9 +215,11 @@ function App() {
         <Form
           calibrate={calibrate}
           devices={devices}
-          setInterval={setIntervalTime}
           interval={intervalTime}
           webcamId={webcamId}
+          sensitivity={sensitivity}
+          setInterval={setIntervalTime}
+          setSensitivity={setSensitivity}
           setwebcamId={setwebcamId}
         />
         <img
