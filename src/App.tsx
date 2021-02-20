@@ -1,6 +1,13 @@
-import { ChakraProvider, VStack } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import { ChakraProvider, VStack, useToast } from "@chakra-ui/react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
+
+import {
+  detectLandmarks,
+  drawFeatures,
+  isBadPosture,
+  loadModels,
+} from "./face-calc";
 
 import { Footer } from "./components/Footer";
 import { Form } from "./components/Form";
@@ -27,28 +34,45 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
 };
 
 function App() {
+  const toast = useToast();
   // one pixel image url xd
-  const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
-
   const [devices, setDevices] = useState([]);
-  const [interval, setInterval] = useState(90);
+  const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
+  const [intervalTime, setIntervalTime] = useState(90);
+  const webcamRef = useRef(null);
 
-  const webcamRef = React.useRef(null);
-  const capture = React.useCallback(() => {
+  useEffect(() => {
+    loadModels();
+  }, []);
+
+  const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
     const imageSrc = ref.getScreenshot();
     setImgSrc(imageSrc);
-    // detectLandmarks - if returns undefined then popup error else continue
-    // drawFeatures - show canvas as well
-    // setInterval
-    /*
-			console.log(
-				await testFunction(
-					document.getElementById("capture") as HTMLImageElement
-				)
-			)
-			*/
-  }, [webcamRef]);
+    const img = document.getElementById("capture") as HTMLImageElement;
+    const canvas = document.getElementById("overlay") as HTMLCanvasElement;
+    const landmarks = await detectLandmarks(img);
+    if (landmarks) {
+      drawFeatures(landmarks, canvas, img);
+    } else {
+      toast({
+        position: "bottom-left",
+        title: "An error occurred.",
+        description: "Unable to detect user.",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  }, [toast, webcamRef]);
+
+  useEffect(() => {
+    // Capture user based on interval set
+    const timer = setInterval(() => {
+      capture();
+    }, intervalTime * 1000);
+    return () => clearInterval(timer);
+  }, [capture, intervalTime]);
 
   const handleDevices = React.useCallback(
     (mediaDevices) => {
@@ -65,10 +89,6 @@ function App() {
     navigator.mediaDevices.enumerateDevices().then(handleDevices);
   }, [handleDevices]);
 
-  useEffect(() => {
-    //loadModels();
-  }, []);
-
   return (
     <div className="container">
       <VStack className="column">
@@ -84,8 +104,8 @@ function App() {
         <Form
           capture={capture}
           devices={devices}
-          setInterval={setInterval}
-          interval={interval}
+          setInterval={setIntervalTime}
+          interval={intervalTime}
         />
         <img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous" />
         <canvas id="overlay" />
