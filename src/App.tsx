@@ -195,6 +195,7 @@ function App() {
                 className="coveredImage"
                 height={200}
                 ref={webcamRef}
+                mirrored={true}
                 screenshotFormat="image/png"
                 width={500}
                 videoConstraints={{ deviceId: webcamId }}
