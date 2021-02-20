@@ -14,12 +14,14 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { TimeIcon } from "@chakra-ui/icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 interface FormProps {
   devices: InputDeviceInfo[];
   capture: () => void;
   setInterval: React.Dispatch<React.SetStateAction<number>>;
   interval: number;
+  webcamId: string;
+  setwebcamId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const Form: React.FC<FormProps> = ({
@@ -27,17 +29,29 @@ export const Form: React.FC<FormProps> = ({
   capture,
   setInterval,
   interval,
+  webcamId,
+  setwebcamId,
 }): JSX.Element => {
   const [sliderVal, setSliderVal] = useState(interval);
+  useEffect(() => {
+    if (devices.length > 0) {
+      setwebcamId(devices[0].deviceId);
+    }
+  }, [devices]);
 
   return (
     <form style={{ width: "100%" }}>
       <VStack spacing={4} p={5} shadow="md" borderWidth="1px" m={4}>
         <FormControl id="selectdevice" w="100%">
           <FormLabel>Webcam</FormLabel>
-          <Select placeholder="Select Device">
+          <Select
+            value={webcamId}
+            onChange={(e) => setwebcamId(e.currentTarget.value)}
+          >
             {devices.map((device, key) => (
-              <option value={device.label}>{device.label}</option>
+              <option key={device.label} value={device.deviceId}>
+                {device.label}
+              </option>
             ))}
           </Select>
         </FormControl>

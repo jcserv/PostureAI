@@ -54,6 +54,7 @@ function App() {
   > | null>(null);
   const webcamRef = useRef(null);
   const [play] = useSound(notification, {volume: 0.75});
+  const [webcamId, setwebcamId] = useState("");
 
   useEffect(() => {
     loadModels();
@@ -81,24 +82,24 @@ function App() {
     });
   };
 
-  const verifyPosture = async (
-    img: HTMLImageElement,
-    landmarks: faceapi.WithFaceLandmarks<
-      { detection: faceapi.FaceDetection },
-      faceapi.FaceLandmarks68
-    >
-  ) => {
+  const notifyerror = () => {
+    play();
+  }
+
+  const verifyPosture = async (img: HTMLImageElement) => {
+    console.log(oldLandmarks);
     if (oldLandmarks) {
       const hasBadPosture = await isBadPosture(oldLandmarks, img);
+      console.log(hasBadPosture);
       if (hasBadPosture) {
-        play();
+        notifyerror();
         displayErrorToast("Your posture requires correction!");
       } else {
         displaySuccessToast("Good job!");
       }
     }
-    setOldLandmarks(landmarks);
   };
+
 
   const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
@@ -109,10 +110,11 @@ function App() {
     const landmarks = await detectLandmarks(img);
     if (landmarks) {
       drawFeatures(landmarks, canvas, img);
-      verifyPosture(img, landmarks);
+      verifyPosture(img);
+      setOldLandmarks(landmarks);
     } else {
       displayErrorToast("Unable to detect user.");
-      play();
+      notifyerror();
     }
     // this is req'd, adding in the dependencies from the warning causes an infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,7 +124,7 @@ function App() {
     // Capture user based on interval set
     const timer = setInterval(() => {
       capture();
-    }, intervalTime * 1000);
+    }, 5 * 1000);
     return () => clearInterval(timer);
   }, [capture, intervalTime]);
 
@@ -153,6 +155,7 @@ function App() {
             ref={webcamRef}
             screenshotFormat="image/png"
             width={500}
+            videoConstraints={{ deviceId: webcamId }}
             onUserMediaError={() => {
               setHasPermissions(false);
               displayErrorToast("Permissions not provided");
@@ -164,12 +167,13 @@ function App() {
             <Text>Please enable webcam access and refresh the page.</Text>
           </>
         )}
-
         <Form
           capture={capture}
           devices={devices}
           setInterval={setIntervalTime}
           interval={intervalTime}
+          webcamId={webcamId}
+          setwebcamId={setwebcamId}
         />
         <div className="outsideWrapper">
           <div className="insideWrapper">
