@@ -52,6 +52,7 @@ function App() {
     faceapi.FaceLandmarks68
   > | null>(null);
   const webcamRef = useRef(null);
+  const [webcamId, setwebcamId] = useState("");
 
   useEffect(() => {
     loadModels();
@@ -96,6 +97,7 @@ function App() {
     }
     setOldLandmarks(landmarks);
   };
+
 
   const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
@@ -149,6 +151,7 @@ function App() {
             ref={webcamRef}
             screenshotFormat="image/png"
             width={500}
+            videoConstraints={{deviceId: webcamId}}
             onUserMediaError={() => {
               setHasPermissions(false);
               displayErrorToast("Permissions not provided");
@@ -160,12 +163,13 @@ function App() {
             <Text>Please enable webcam access and refresh the page.</Text>
           </>
         )}
-
         <Form
           capture={capture}
           devices={devices}
           setInterval={setIntervalTime}
           interval={intervalTime}
+          webcamId={webcamId}
+          setwebcamId={setwebcamId}
         />
         <div className="outsideWrapper">
           <div className="insideWrapper">
