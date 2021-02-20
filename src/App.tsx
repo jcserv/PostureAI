@@ -68,10 +68,6 @@ function App() {
     load();
   }, []);
 
-  // let livefeed = () => {
-  //   setInterval
-  // }
-
   const displaySuccessToast = (message: string) => {
     toast({
       position: "bottom-left",
