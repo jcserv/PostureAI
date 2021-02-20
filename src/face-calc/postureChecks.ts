@@ -55,7 +55,10 @@ const proximityCheck = (
 
   const percentageChange =
     Math.abs(newDistance - groundTruthDistance) / groundTruthDistance;
-  console.log("Proximity check results:", {percentageChange, changeLimit : LIMIT});
+  console.log("Proximity check results:", {
+    percentageChange,
+    changeLimit: LIMIT,
+  });
 
   return percentageChange > LIMIT;
 };

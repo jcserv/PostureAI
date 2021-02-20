@@ -24,7 +24,6 @@ import { Navbar } from "./components/Navbar";
 import useSound from "use-sound";
 import notification from "./sounds/notification.mp3";
 import "./App.css";
-import { verify } from "crypto";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -46,6 +45,7 @@ function App() {
   const toast = useToast();
   // one pixel image url xd
   const [devices, setDevices] = useState([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [hasPermissions, setHasPermissions] = useState(true);
   const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
   const [intervalTime, setIntervalTime] = useState(90);
@@ -61,8 +61,16 @@ function App() {
   const [webcamId, setwebcamId] = useState("");
 
   useEffect(() => {
-    loadModels();
+    async function load() {
+      await loadModels();
+      setHasLoaded(true);
+    }
+    load();
   }, []);
+
+  // let livefeed = () => {
+  //   setInterval
+  // }
 
   const displaySuccessToast = (message: string) => {
     toast({
@@ -87,37 +95,36 @@ function App() {
     });
   };
 
+  const drawFaceMesh = (
+    landmarks: faceapi.WithFaceLandmarks<
+      { detection: faceapi.FaceDetection },
+      faceapi.FaceLandmarks68
+    >
+  ) => {
+    const img = document.getElementById("capture") as HTMLImageElement;
+    const canvas = document.getElementById("overlay") as HTMLCanvasElement;
+    drawFeatures(landmarks, canvas, img);
+  };
+
   const verifyPosture = async (img: HTMLImageElement) => {
     if (calibratedLandmarks) {
       const hasBadPosture = await isBadPosture(calibratedLandmarks, img);
       if (hasBadPosture) {
         displayErrorToast("Your posture requires correction!");
+        drawFaceMesh(calibratedLandmarks);
       } else {
         displaySuccessToast("Good job!");
       }
     }
   };
 
-  const drawFaceMesh = (
-    landmarks: faceapi.WithFaceLandmarks<
-      { detection: faceapi.FaceDetection },
-      faceapi.FaceLandmarks68
-    >,
-    callback: (img: HTMLImageElement) => void
-  ) => {
-    const img = document.getElementById("capture") as HTMLImageElement;
-    const canvas = document.getElementById("overlay") as HTMLCanvasElement;
-    drawFeatures(landmarks, canvas, img);
-    if (callback) callback(img);
-  };
-
   const calibrate = async () => {
     const landmarks = await capture();
     if (landmarks) {
-      drawFaceMesh(landmarks, () => {});
+      drawFaceMesh(landmarks);
       setCalibratedLandmarks(landmarks);
     } else {
-      displayErrorToast("Unable to detect user.");
+      //displayErrorToast("Unable to detect user.");
     }
   };
 
@@ -131,16 +138,34 @@ function App() {
   }, [webcamRef]);
 
   useEffect(() => {
+    // Continually draw face mesh on video
+    // Capture user based on interval set
+    const timer = setInterval(async () => {
+      if (calibratedLandmarks || !hasLoaded) return;
+      const newLandmarks = await capture();
+      if (newLandmarks) {
+        drawFaceMesh(newLandmarks);
+      } else {
+        displayErrorToast("Unable to detect user.");
+      }
+    }, 33);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calibratedLandmarks, capture]);
+
+  useEffect(() => {
+    // Regular posture checks
     // Capture user based on interval set
     const timer = setInterval(async () => {
       if (!calibratedLandmarks) return;
       const newLandmarks = await capture();
       if (newLandmarks) {
-        drawFaceMesh(newLandmarks, verifyPosture);
+        const img = document.getElementById("capture") as HTMLImageElement;
+        verifyPosture(img);
       } else {
         displayErrorToast("Unable to detect user.");
       }
-    }, 5 * 1000);
+    }, intervalTime * 1000);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [calibratedLandmarks, capture, intervalTime]);
@@ -166,18 +191,24 @@ function App() {
         <Header />
         <InfoBox />
         {hasPermissions ? (
-          <Webcam
-            audio={false}
-            height={200}
-            ref={webcamRef}
-            screenshotFormat="image/png"
-            width={500}
-            videoConstraints={{ deviceId: webcamId }}
-            onUserMediaError={() => {
-              setHasPermissions(false);
-              displayErrorToast("Permissions not provided");
-            }}
-          />
+          <div className="outsideWrapper">
+            <div className="insideWrapper">
+              <Webcam
+                audio={false}
+                className="coveredImage"
+                height={200}
+                ref={webcamRef}
+                screenshotFormat="image/png"
+                width={500}
+                videoConstraints={{ deviceId: webcamId }}
+                onUserMediaError={() => {
+                  setHasPermissions(false);
+                  displayErrorToast("Permissions not provided");
+                }}
+              />
+              <canvas id="overlay" className="coveringCanvas" />
+            </div>
+          </div>
         ) : (
           <>
             <Spinner size="xl" />
@@ -192,18 +223,13 @@ function App() {
           webcamId={webcamId}
           setwebcamId={setwebcamId}
         />
-        <div className="outsideWrapper">
-          <div className="insideWrapper">
-            <img
-              src={imgSrc}
-              alt="capture"
-              id="capture"
-              crossOrigin="anonymous"
-              className="coveredImage"
-            />
-            <canvas id="overlay" className="coveringCanvas" />
-          </div>
-        </div>
+        <img
+          src={imgSrc}
+          alt="capture"
+          id="capture"
+          crossOrigin="anonymous"
+          style={{ display: "none" }}
+        />
       </VStack>
     </div>
   );
