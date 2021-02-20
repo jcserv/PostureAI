@@ -1,8 +1,6 @@
 
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
-import { Devicedropdown } from "./components/Devicedropdown";
-import { Calibration } from "./components/CalibrateButton";
 import { ChakraProvider, VStack } from '@chakra-ui/react';
 import React, { useState, useEffect } from 'react';
 import Webcam from 'react-webcam';
@@ -34,16 +32,20 @@ function App() {
   const webcamRef = React.useRef(null);
 
   const [devices, setDevices] = useState([]);
-
+  const [interval, setInterval] = useState(90);
 
   const capture = React.useCallback(
     () => {
       const ref = webcamRef.current as any
       const imageSrc = ref.getScreenshot();
       setImgSrc(imageSrc);
+      // detectLandmarks - if returns undefined then popup error else continue
+      // drawFeatures - show canvas as well
+      // setInterval
     },
     [webcamRef]
   );
+
 
   const handleDevices = React.useCallback(
     mediaDevices => {
@@ -66,9 +68,7 @@ function App() {
 				<Header />
 				<InfoBox />
 				<Webcam audio={false} height={200} ref={webcamRef} screenshotFormat="image/png" width={500} />
-        <Devicedropdown devices={devices} />
-        <Calibration handler={capture} />
-				<Form />
+				<Form capture={capture} devices={devices} setInterval={setInterval} interval={interval} />
 				{imgSrc && <img src={imgSrc} alt="capture" />}
 			</VStack>
 		</div>
