@@ -56,10 +56,13 @@ const isBadPosture = async (
     >,
     input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<Boolean | null> => {
+    console.log("Initiate posture check")
     const newDetection = await detectLandmarks(input);
     //TODO
-    if (!newDetection)
+    if (!newDetection) {
+        console.log("No face found in posture check")
         return null
+    }
 
     const positionCheck = absolutePositionCheck(input.width, input.height, groundTruthDetection, newDetection)
     return positionCheck;
