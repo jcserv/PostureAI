@@ -16,13 +16,17 @@ a {
 }
 
 .container {
-  min-height: 100vh;
-  padding: 0 0.5rem;
+  max-width: 100vw;
+  min-height: 70vh;
   display: flex;
   overflow-x: hidden;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.column {
+  max-width: 35vw;
 }
 
 .main {

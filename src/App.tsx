@@ -1,27 +1,33 @@
-import { ChakraProvider } from "@chakra-ui/react";
-import React, { useState, useEffect } from 'react';
-import Webcam from "react-webcam";
 
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { Devicedropdown } from "./components/Devicedropdown";
 import { Calibration } from "./components/CalibrateButton";
+import { ChakraProvider, VStack } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import Webcam from 'react-webcam';
+
+
+import { Form } from './components/Form';
+import { Header } from './components/Header';
+import { InfoBox } from './components/InfoBox';
+
+
+import './App.css';
 
 interface PageWrapperProps {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }
 
-const PageWrapper: React.FC<PageWrapperProps> = ({
-  children,
-}: PageWrapperProps) => {
-  return (
-    <div style={{ overflowX: "hidden" }}>
-      <Navbar />
-      {children}
-      <Footer />
-    </div>
-  );
-}
+const PageWrapper: React.FC<PageWrapperProps> = ({ children }: PageWrapperProps) => {
+	return (
+		<div style={{ overflowX: 'hidden' }}>
+			<Navbar />
+			{children}
+			<Footer />
+		</div>
+	);
+};
 
 function App() {
   const [ imgSrc, setImgSrc ] = useState("");
@@ -44,7 +50,7 @@ function App() {
         setDevices(mediaDevices.filter((device:InputDeviceInfo) => device.kind === "videoinput"))
      } ,
     [setDevices]
-);
+  );
 
   useEffect(
     () => {
@@ -53,31 +59,31 @@ function App() {
     [handleDevices]
   );
 
-  return (
-    <div className="container">
-      <Webcam
-        audio={false}
-        height={720}
-        ref={webcamRef}
-        screenshotFormat="image/png"
-        width={1280}
-      />
-      <Devicedropdown devices={devices} />
-      <Calibration handler={capture} />
-      <button onClick={capture}>Capture photo</button>
-      {imgSrc && <img src={imgSrc} alt="capture"/>}
-    </div>
-  );
+
+	return (
+		<div className="container">
+			<VStack className="column">
+				<Header />
+				<InfoBox />
+				<Webcam audio={false} height={200} ref={webcamRef} screenshotFormat="image/png" width={500} />
+        <Devicedropdown devices={devices} />
+        <Calibration handler={capture} />
+				<Form />
+				{imgSrc && <img src={imgSrc} alt="capture" />}
+			</VStack>
+		</div>
+	);
+
 }
 
 function ConnectedApp() {
-  return (
-    <ChakraProvider>
-      <PageWrapper>
-      <App/>
-      </PageWrapper>
-    </ChakraProvider>
-  )
+	return (
+		<ChakraProvider>
+			<PageWrapper>
+				<App />
+			</PageWrapper>
+		</ChakraProvider>
+	);
 }
 
 export default ConnectedApp;
