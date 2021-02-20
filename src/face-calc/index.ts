@@ -1,6 +1,6 @@
 import * as faceapi from "face-api.js";
 
-import {absolutePositionCheck} from "./postureChecks"
+import { absolutePositionCheck } from "./postureChecks";
 
 const MODEL_URL = "./models";
 
@@ -50,11 +50,11 @@ const drawFeatures = (
 
 // returns null if no face found
 const isBadPosture = async (
-    groundTruthDetection: faceapi.WithFaceLandmarks<
-        { detection: faceapi.FaceDetection },
-        faceapi.FaceLandmarks68
-    >,
-    input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
+  groundTruthDetection: faceapi.WithFaceLandmarks<
+    { detection: faceapi.FaceDetection },
+    faceapi.FaceLandmarks68
+  >,
+  input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
 ): Promise<Boolean | null> => {
     console.log("Initiate posture check")
     const newDetection = await detectLandmarks(input);
@@ -64,8 +64,13 @@ const isBadPosture = async (
         return null
     }
 
-    const positionCheck = absolutePositionCheck(input.width, input.height, groundTruthDetection, newDetection)
-    return positionCheck;
+  const positionCheck = absolutePositionCheck(
+    input.width,
+    input.height,
+    groundTruthDetection,
+    newDetection
+  );
+  return positionCheck;
 };
 
 export { loadModels, detectLandmarks, drawFeatures, isBadPosture };
