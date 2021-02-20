@@ -14,7 +14,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { TimeIcon } from "@chakra-ui/icons";
-import React, {useEffect} from "react";
+import React, { useState, useEffect } from "react";
 interface FormProps {
   devices: InputDeviceInfo[];
   capture: () => void;
@@ -33,8 +33,7 @@ export const Form: React.FC<FormProps> = ({
   webcamId,
   setwebcamId
 }): JSX.Element => {
-
-  
+  const [sliderVal, setSliderVal] = useState(interval);
   useEffect(() => {
 		if(devices.length > 0) {
 			setwebcamId(devices[0].deviceId);
@@ -56,8 +55,8 @@ export const Form: React.FC<FormProps> = ({
             aria-label="slider-ex-4"
             min={60}
             max={120}
-            value={interval}
-            onChange={(val) => setInterval(val)}
+            value={sliderVal}
+            onChange={(val) => setSliderVal(val)}
           >
             <SliderTrack bg="red.100">
               <SliderFilledTrack bg="tomato" />
@@ -67,14 +66,21 @@ export const Form: React.FC<FormProps> = ({
             </SliderThumb>
           </Slider>
           <Center>
-            <Text>{interval} seconds</Text>
+            <Text>{sliderVal} seconds</Text>
           </Center>
           <FormHelperText>
             Select how frequently you want us to check your posture!
           </FormHelperText>
         </FormControl>
         <Center>
-          <Button onClick={() => capture()}>Calibrate</Button>
+          <Button
+            onClick={() => {
+              setInterval(sliderVal);
+              capture();
+            }}
+          >
+            Calibrate
+          </Button>
         </Center>
       </VStack>
     </form>

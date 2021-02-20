@@ -1,6 +1,20 @@
-import { ChakraProvider, VStack } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import {
+  ChakraProvider,
+  VStack,
+  useToast,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
+import * as faceapi from "face-api.js";
+
+import {
+  detectLandmarks,
+  drawFeatures,
+  isBadPosture,
+  loadModels,
+} from "./face-calc";
 
 import { Footer } from "./components/Footer";
 import { Form } from "./components/Form";
@@ -27,29 +41,88 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
 };
 
 function App() {
+  const toast = useToast();
   // one pixel image url xd
-  const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
-
   const [devices, setDevices] = useState([]);
-  const [interval, setInterval] = useState(90);
+  const [hasPermissions, setHasPermissions] = useState(true);
+  const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
+  const [intervalTime, setIntervalTime] = useState(90);
+  const [oldLandmarks, setOldLandmarks] = useState<faceapi.WithFaceLandmarks<
+    { detection: faceapi.FaceDetection },
+    faceapi.FaceLandmarks68
+  > | null>(null);
+  const webcamRef = useRef(null);
   const [webcamId, setwebcamId] = useState("");
 
-  const webcamRef = React.useRef(null);
-  const capture = React.useCallback(() => {
+  useEffect(() => {
+    loadModels();
+  }, []);
+
+  const displaySuccessToast = (message: string) => {
+    toast({
+      position: "bottom-left",
+      title: "Your posture looks great!",
+      description: message,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+  const displayErrorToast = (message: string) => {
+    toast({
+      position: "bottom-left",
+      title: "An error occurred.",
+      description: message,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+  const verifyPosture = async (
+    img: HTMLImageElement,
+    landmarks: faceapi.WithFaceLandmarks<
+      { detection: faceapi.FaceDetection },
+      faceapi.FaceLandmarks68
+    >
+  ) => {
+    if (oldLandmarks) {
+      const hasBadPosture = await isBadPosture(oldLandmarks, img);
+      if (hasBadPosture) {
+        displayErrorToast("Your posture requires correction!");
+      } else {
+        displaySuccessToast("Good job!");
+      }
+    }
+    setOldLandmarks(landmarks);
+  };
+
+
+  const capture = useCallback(async () => {
     const ref = webcamRef.current as any;
     const imageSrc = ref.getScreenshot();
     setImgSrc(imageSrc);
-    // detectLandmarks - if returns undefined then popup error else continue
-    // drawFeatures - show canvas as well
-    // setInterval
-    /*
-			console.log(
-				await testFunction(
-					document.getElementById("capture") as HTMLImageElement
-				)
-			)
-			*/
+    const img = document.getElementById("capture") as HTMLImageElement;
+    const canvas = document.getElementById("overlay") as HTMLCanvasElement;
+    const landmarks = await detectLandmarks(img);
+    if (landmarks) {
+      drawFeatures(landmarks, canvas, img);
+      verifyPosture(img, landmarks);
+    } else {
+      displayErrorToast("Unable to detect user.");
+    }
+    // this is req'd, adding in the dependencies from the warning causes an infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [webcamRef]);
+
+  useEffect(() => {
+    // Capture user based on interval set
+    const timer = setInterval(() => {
+      capture();
+    }, intervalTime * 1000);
+    return () => clearInterval(timer);
+  }, [capture, intervalTime]);
 
   const handleDevices = React.useCallback(
     (mediaDevices) => {
@@ -66,33 +139,50 @@ function App() {
     navigator.mediaDevices.enumerateDevices().then(handleDevices);
   }, [handleDevices]);
 
-  useEffect(() => {
-    //loadModels();
-  }, []);
-
   return (
     <div className="container">
       <VStack className="column">
         <Header />
         <InfoBox />
-        <Webcam
-          audio={false}
-          height={200}
-          ref={webcamRef}
-          screenshotFormat="image/png"
-          width={500}
-          videoConstraints={{deviceId: webcamId}}
-        />
+        {hasPermissions ? (
+          <Webcam
+            audio={false}
+            height={200}
+            ref={webcamRef}
+            screenshotFormat="image/png"
+            width={500}
+            videoConstraints={{deviceId: webcamId}}
+            onUserMediaError={() => {
+              setHasPermissions(false);
+              displayErrorToast("Permissions not provided");
+            }}
+          />
+        ) : (
+          <>
+            <Spinner size="xl" />
+            <Text>Please enable webcam access and refresh the page.</Text>
+          </>
+        )}
         <Form
           capture={capture}
           devices={devices}
-          setInterval={setInterval}
-          interval={interval}
+          setInterval={setIntervalTime}
+          interval={intervalTime}
           webcamId={webcamId}
           setwebcamId={setwebcamId}
         />
-        <img src={imgSrc} alt="capture" id="capture" crossOrigin="anonymous"/>
-        <canvas id="overlay" />
+        <div className="outsideWrapper">
+          <div className="insideWrapper">
+            <img
+              src={imgSrc}
+              alt="capture"
+              id="capture"
+              crossOrigin="anonymous"
+              className="coveredImage"
+            />
+            <canvas id="overlay" className="coveringCanvas" />
+          </div>
+        </div>
       </VStack>
     </div>
   );
