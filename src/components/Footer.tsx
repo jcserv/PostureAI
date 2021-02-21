@@ -1,4 +1,12 @@
-import { Box, Icon, Link, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Icon,
+  Link,
+  Stack,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { FaDev } from "react-icons/fa";
 import { VscGithubInverted } from "react-icons/vsc";
 
 export const Footer = (): JSX.Element => {
@@ -8,7 +16,14 @@ export const Footer = (): JSX.Element => {
       icon: VscGithubInverted,
       url: "https://github.com/jcserv/PostureAI/",
     },
+    {
+      label: "Devpost",
+      icon: FaDev,
+      url: "https://devpost.com/software/placeholder-9gjdst",
+    },
   ];
+
+  const color = useColorModeValue("purple.500", "purple.300");
   return (
     <Box as="footer" mt={12} height="100%" textAlign="center" className="app">
       <Text fontSize="sm">
@@ -46,7 +61,12 @@ export const Footer = (): JSX.Element => {
               aria-label={link.label}
               isExternal
             >
-              <Icon as={link.icon} fontSize="xl" color="gray.400" />
+              <Icon
+                as={link.icon}
+                fontSize="xl"
+                color="gray.400"
+                _hover={{ color: color }}
+              />
             </Link>
           );
         })}
