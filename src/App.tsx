@@ -4,6 +4,8 @@ import {
   useToast,
   Spinner,
   Text,
+  Heading,
+  Progress
 } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
@@ -49,6 +51,8 @@ function App() {
   const [hasPermissions, setHasPermissions] = useState(true);
   const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
   const [intervalTime, setIntervalTime] = useState(90);
+  const [countDown, setCountDown] = useState(90);
+  const [timer, setTimer] = useState(false);
   const [
     calibratedLandmarks,
     setCalibratedLandmarks,
@@ -59,15 +63,13 @@ function App() {
   const webcamRef = useRef(null);
   const [play] = useSound(notification, { volume: 0.1 });
   const [webcamId, setwebcamId] = useState("");
-
   useEffect(() => {
     async function load() {
       await loadModels();
       setHasLoaded(true);
     }
-    load();
+    load(); 
   }, []);
-
   const displaySuccessToast = (message: string) => {
     toast({
       position: "bottom-left",
@@ -108,17 +110,26 @@ function App() {
       if (hasBadPosture) {
         displayErrorToast("Your posture requires correction!");
         drawFaceMesh(calibratedLandmarks);
+        setTimer(false);
       } else {
+        setTimer(true);
+        setCountDown(intervalTime);
         displaySuccessToast("Good job!");
       }
     }
   };
 
-  const calibrate = async () => {
+  const calibrate = async (sliderVal: number) => {
     const landmarks = await capture();
     if (landmarks) {
       drawFaceMesh(landmarks);
       setCalibratedLandmarks(landmarks);
+      setTimer(() => {
+        setIntervalTime(sliderVal);
+        setCountDown(sliderVal);
+        return true;
+      });
+
     } else {
       //displayErrorToast("Unable to detect user.");
     }
@@ -132,6 +143,18 @@ function App() {
     return await detectLandmarks(img);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [webcamRef]);
+
+  const comparePostures = async () => {
+    if (!calibratedLandmarks) return;
+    const newLandmarks = await capture();
+    if (newLandmarks) {
+      const img = document.getElementById("capture") as HTMLImageElement;
+      verifyPosture(img);
+    } else {
+      displayErrorToast("Unable to detect user.");
+      setTimer(false);
+    }
+  }
 
   useEffect(() => {
     // Continually draw face mesh on video
@@ -149,22 +172,47 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [calibratedLandmarks, capture]);
 
+  // useEffect(() => {
+  //   // Regular posture checks
+  //   // Capture user based on interval set
+  //   const timer = setInterval(async () => {
+  //     if (!calibratedLandmarks) return;
+  //     const newLandmarks = await capture();
+  //     if (newLandmarks) {
+  //       const img = document.getElementById("capture") as HTMLImageElement;
+  //       verifyPosture(img);
+  //     } else {
+  //       displayErrorToast("Unable to detect user.");
+  //     }
+  //   }, intervalTime * 1000);
+  //   return () => clearInterval(timer);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [calibratedLandmarks, capture, intervalTime]);
+
   useEffect(() => {
-    // Regular posture checks
-    // Capture user based on interval set
-    const timer = setInterval(async () => {
-      if (!calibratedLandmarks) return;
-      const newLandmarks = await capture();
-      if (newLandmarks) {
-        const img = document.getElementById("capture") as HTMLImageElement;
-        verifyPosture(img);
-      } else {
-        displayErrorToast("Unable to detect user.");
+    console.log(timer);
+    if(timer) {
+      if(countDown > 1) {
+        const time = setTimeout(() => setCountDown(countDown - 1), 1000);
+        return () => clearTimeout(time);
       }
-    }, intervalTime * 1000);
-    return () => clearInterval(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calibratedLandmarks, capture, intervalTime]);
+      else if(countDown == 1) {
+        const time = setTimeout(() => {setCountDown(countDown - 1); setTimer(false);}, 1000);
+        return () => clearTimeout(time);
+      }
+    }
+    else {
+      console.log(countDown);
+        if(countDown == 0) {
+          const time = setTimeout(() => {setCountDown(countDown - 1); comparePostures(); }, 1000);
+          return () => clearTimeout(time);
+        }
+        else {
+          const time = setTimeout(() => {setCountDown(countDown - 1); comparePostures();}, 1000);
+          return () => clearTimeout(time);
+        }
+    }
+  }, [timer, intervalTime, countDown]);
 
   const handleDevices = React.useCallback(
     (mediaDevices) => {
@@ -176,6 +224,8 @@ function App() {
     },
     [setDevices]
   );
+
+
 
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then(handleDevices);
@@ -204,6 +254,7 @@ function App() {
               />
               <canvas id="overlay" className="coveringCanvas" />
             </div>
+
           </div>
         ) : (
           <>
@@ -211,6 +262,11 @@ function App() {
             <Text>Please enable webcam access and refresh the page.</Text>
           </>
         )}
+        {timer && countDown >= 0 && 
+        <>
+          <Heading>{countDown + "s"}</Heading>
+          <Progress hasStripe colorScheme="purple" value={(countDown/intervalTime) * 100} w="100%" />
+        </>}
         <Form
           calibrate={calibrate}
           devices={devices}
