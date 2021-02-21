@@ -109,6 +109,7 @@ export const Form: React.FC<FormProps> = ({
         </FormControl>
         <Center>
           <Button
+            colorScheme="teal"
             onClick={() => {
               setInterval(sliderVal);
               setSensitivity(sensVal);

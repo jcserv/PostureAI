@@ -138,7 +138,9 @@ function App() {
     // Continually draw face mesh on video
     // Capture user based on interval set
     const timer = setInterval(async () => {
-      if (calibratedLandmarks || !hasLoaded) return;
+      if (calibratedLandmarks || !hasLoaded) {
+        return;
+      }
       const newLandmarks = await capture();
       if (newLandmarks) {
         drawFaceMesh(newLandmarks);
@@ -195,6 +197,7 @@ function App() {
                 className="coveredImage"
                 height={200}
                 ref={webcamRef}
+                mirrored={true}
                 screenshotFormat="image/png"
                 width={500}
                 videoConstraints={{ deviceId: webcamId }}

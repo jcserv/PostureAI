@@ -6,7 +6,7 @@ export const Footer = (): JSX.Element => {
     {
       label: "Github",
       icon: VscGithubInverted,
-      url: "https://github.com/jcserv/uofthacks/",
+      url: "https://github.com/jcserv/posture.ai/",
     },
   ];
   return (
@@ -32,7 +32,7 @@ export const Footer = (): JSX.Element => {
           Michael Phung
         </Link>
         , &{" "}
-        <Link href="http://jarrodservilla.com" isExternal>
+        <Link href="https://www.linkedin.com/in/jarrod-servilla/" isExternal>
           Jarrod Servilla
         </Link>
       </Text>

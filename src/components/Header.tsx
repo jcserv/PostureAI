@@ -4,13 +4,18 @@ export const Header = (): JSX.Element => {
   return (
     <VStack>
       <chakra.h1
+        className="header"
         fontSize={{ base: "2.25rem", sm: "3rem", lg: "3.75rem" }}
         letterSpacing="tight"
         fontWeight="bold"
         lineHeight="1.2"
       >
         posture
-        <Box as="span" color={useColorModeValue("purple.500", "purple.300")}>
+        <Box
+          as="span"
+          className="header"
+          color={useColorModeValue("purple.500", "purple.300")}
+        >
           .ai
         </Box>
       </chakra.h1>
