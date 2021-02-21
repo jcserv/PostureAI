@@ -137,10 +137,10 @@ function App() {
   useEffect(() => {
     // Continually draw face mesh on video
     // Capture user based on interval set
-    if (calibratedLandmarks || !hasLoaded) { 
-      return; 
-    }
     const timer = setInterval(async () => {
+      if (calibratedLandmarks || !hasLoaded) {
+        return;
+      }
       const newLandmarks = await capture();
       if (newLandmarks) {
         drawFaceMesh(newLandmarks);
