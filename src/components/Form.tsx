@@ -18,7 +18,7 @@ import { RepeatIcon, TimeIcon } from "@chakra-ui/icons";
 import React, { useState, useEffect } from "react";
 
 interface FormProps {
-  calibrate: () => void;
+  calibrate: (sliderVal: number) => void;
   devices: InputDeviceInfo[];
   interval: number;
   sensitivity: number;
@@ -124,7 +124,7 @@ export const Form: React.FC<FormProps> = ({
               setHasBeenClicked(true);
               setIntervalTime(sliderVal);
               setSensitivity(sensVal);
-              calibrate();
+              calibrate(sliderVal);
             }}
           >
             Calibrate
