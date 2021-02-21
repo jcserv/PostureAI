@@ -22,7 +22,7 @@ interface FormProps {
   devices: InputDeviceInfo[];
   interval: number;
   sensitivity: number;
-  setInterval: React.Dispatch<React.SetStateAction<number>>;
+  setIntervalTime: React.Dispatch<React.SetStateAction<number>>;
   setSensitivity: React.Dispatch<React.SetStateAction<number>>;
   setwebcamId: React.Dispatch<React.SetStateAction<string>>;
   webcamId: string;
@@ -33,11 +33,13 @@ export const Form: React.FC<FormProps> = ({
   devices,
   interval,
   sensitivity,
-  setInterval,
+  setIntervalTime,
   setSensitivity,
   setwebcamId,
   webcamId,
 }): JSX.Element => {
+  const [hasBeenClicked, setHasBeenClicked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [sliderVal, setSliderVal] = useState(interval);
   const [sensVal, setSensVal] = useState(sensitivity);
   useEffect(() => {
@@ -111,8 +113,16 @@ export const Form: React.FC<FormProps> = ({
         <Center>
           <Button
             colorScheme="teal"
+            isLoading={isLoading}
             onClick={() => {
-              setInterval(sliderVal);
+              if (!hasBeenClicked) {
+                setIsLoading(true);
+                setInterval(() => {
+                  setIsLoading(false);
+                }, 3000);
+              }
+              setHasBeenClicked(true);
+              setIntervalTime(sliderVal);
               setSensitivity(sensVal);
               calibrate();
             }}
