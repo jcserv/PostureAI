@@ -45,7 +45,6 @@ function App() {
   const toast = useToast();
   // one pixel image url xd
   const [devices, setDevices] = useState([]);
-  const [hasLoaded, setHasLoaded] = useState(false);
   const [hasPermissions, setHasPermissions] = useState(true);
   const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
   const [intervalTime, setIntervalTime] = useState(90);
@@ -62,11 +61,7 @@ function App() {
   const [webcamId, setwebcamId] = useState("");
 
   useEffect(() => {
-    async function load() {
-      await loadModels();
-      setHasLoaded(true);
-    }
-    load();
+    loadModels();
   }, []);
 
   const displaySuccessToast = (message: string) => {
@@ -121,7 +116,7 @@ function App() {
       drawFaceMesh(landmarks);
       setCalibratedLandmarks(landmarks);
     } else {
-      //displayErrorToast("Unable to detect user.");
+      displayErrorToast("Unable to detect user.");
     }
   };
 
@@ -133,24 +128,6 @@ function App() {
     return await detectLandmarks(img);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [webcamRef]);
-
-  useEffect(() => {
-    // Continually draw face mesh on video
-    // Capture user based on interval set
-    const timer = setInterval(async () => {
-      if (calibratedLandmarks || !hasLoaded) {
-        return;
-      }
-      const newLandmarks = await capture();
-      if (newLandmarks) {
-        drawFaceMesh(newLandmarks);
-      } else {
-        displayErrorToast("Unable to detect user.");
-      }
-    }, 33);
-    return () => clearInterval(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calibratedLandmarks, capture]);
 
   useEffect(() => {
     // Regular posture checks
