@@ -5,7 +5,7 @@ import {
   Spinner,
   Text,
   Heading,
-  Progress
+  Progress,
 } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
@@ -129,7 +129,6 @@ function App() {
         setCountDown(sliderVal);
         return true;
       });
-
     } else {
       displayErrorToast("Unable to detect user.");
     }
@@ -154,23 +153,26 @@ function App() {
       displayErrorToast("Unable to detect user.");
       setTimer(false);
     }
-  }
-
+  };
 
   useEffect(() => {
-    if(timer) {
-      if(countDown > 1) {
+    if (timer) {
+      if (countDown > 1) {
         const time = setTimeout(() => setCountDown(countDown - 1), 1000);
         return () => clearTimeout(time);
-      }
-      else if(countDown == 1) {
-        const time = setTimeout(() => {setCountDown(countDown - 1); setTimer(false);}, 1000);
+      } else if (countDown == 1) {
+        const time = setTimeout(() => {
+          setCountDown(countDown - 1);
+          setTimer(false);
+        }, 1000);
         return () => clearTimeout(time);
       }
-    }
-    else {
-        const time = setTimeout(() => {setCountDown(countDown - 1); comparePostures(); }, 1000);
-        return () => clearTimeout(time);
+    } else {
+      const time = setTimeout(() => {
+        setCountDown(countDown - 1);
+        comparePostures();
+      }, 1000);
+      return () => clearTimeout(time);
     }
   }, [timer, intervalTime, countDown]);
 
@@ -184,8 +186,6 @@ function App() {
     },
     [setDevices]
   );
-
-
 
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then(handleDevices);
@@ -215,7 +215,6 @@ function App() {
               />
               <canvas id="overlay" className="coveringCanvas" />
             </div>
-
           </div>
         ) : (
           <>
@@ -223,11 +222,17 @@ function App() {
             <Text>Please enable webcam access and refresh the page.</Text>
           </>
         )}
-        {timer && countDown >= 0 && 
-        <>
-          <Heading>{countDown + "s"}</Heading>
-          <Progress hasStripe colorScheme="purple" value={(countDown/intervalTime) * 100} w="100%" />
-        </>}
+        {timer && countDown >= 0 && (
+          <>
+            <Heading>{countDown + "s"}</Heading>
+            <Progress
+              hasStripe
+              colorScheme="purple"
+              value={(countDown / intervalTime) * 100}
+              w="100%"
+            />
+          </>
+        )}
         <Form
           calibrate={calibrate}
           devices={devices}

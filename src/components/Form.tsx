@@ -108,7 +108,9 @@ export const Form: React.FC<FormProps> = ({
           <Center>
             <Text>{sensVal}</Text>
           </Center>
-          <FormHelperText>Select the sensitivity</FormHelperText>
+          <FormHelperText>
+            Set the sensitivity of the posture checker
+          </FormHelperText>
         </FormControl>
         <Center>
           <Button

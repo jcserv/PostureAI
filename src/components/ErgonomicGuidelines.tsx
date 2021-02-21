@@ -12,7 +12,7 @@ import {
 
 export const ErgonomicGuidelines = (): JSX.Element => {
   return (
-    <Accordion defaultIndex={[0]} allowToggle w="100%">
+    <Accordion defaultIndex={[0]} allowToggle w="100%" pt={4}>
       <AccordionItem>
         <h2>
           <AccordionButton>

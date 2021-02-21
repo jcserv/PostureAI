@@ -11,10 +11,24 @@ export const InfoBox = (): JSX.Element => {
         </Text>{" "}
         analyzes your posture & notifies you in real-time!
       </Text>
-      <Text opacity={0.8} fontSize={{ base: "lg", lg: "xl" }} mt="6">
+      <Text
+        opacity={0.8}
+        fontSize={{ base: "lg", lg: "xl" }}
+        mt="6"
+        textAlign="center"
+      >
         Get into an ergonomic position, set your timer, click calibrate, and get
-        cracking! You can minimize the browser and PostureAI will play an audio
-        notification if we identify bad posture!
+        cracking! You can minimize the browser and{" "}
+        <span>
+          <Text as="strong">Posture</Text>
+          <Text
+            as="strong"
+            color={useColorModeValue("purple.500", "purple.300")}
+          >
+            AI
+          </Text>
+        </span>{" "}
+        will play an audio notification if we identify bad posture!
       </Text>
       <ErgonomicGuidelines />
     </VStack>
