@@ -1,9 +1,26 @@
-import { VStack, Text, useColorModeValue } from "@chakra-ui/react";
+import {
+  VStack,
+  Text,
+  useBreakpointValue,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { ErgonomicGuidelines } from "./ErgonomicGuidelines";
 
 export const InfoBox = (): JSX.Element => {
+  const responsiveWidth = useBreakpointValue({
+    base: "85vw",
+    sm: "60vw",
+    md: "45vw",
+  });
   return (
-    <VStack p={5} shadow="md" borderWidth="1px" m={4}>
+    <VStack
+      p={5}
+      shadow="md"
+      borderWidth="1px"
+      m={4}
+      textAlign="center"
+      w={responsiveWidth}
+    >
       <Text opacity={0.8} fontSize={{ base: "lg", lg: "xl" }}>
         <Text as="strong">Posture</Text>
         <Text as="strong" color={useColorModeValue("purple.500", "purple.300")}>

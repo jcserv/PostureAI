@@ -2,7 +2,7 @@ import { Box, VStack, Text, useColorModeValue, chakra } from "@chakra-ui/react";
 
 export const Header = (): JSX.Element => {
   return (
-    <VStack>
+    <VStack textAlign="center">
       <chakra.h1
         className="header"
         fontSize={{ base: "2.25rem", sm: "3rem", lg: "3.75rem" }}
