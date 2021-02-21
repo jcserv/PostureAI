@@ -1,6 +1,6 @@
 <br />
 <p align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="http://postureai.tech/">
     <img src="public/logo.png" alt="Logo">
   </a>
 
@@ -17,6 +17,8 @@
 
   <p align="center">
     PostureAI analyzes your posture & notifies you in real-time!
+    <br />
+    Received 1st Place in Best Use of Google Cloud at UofTHacks VIII
     <br />
     <a href="https://postureai.tech">View Demo</a>
   </p>

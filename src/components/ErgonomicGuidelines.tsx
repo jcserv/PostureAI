@@ -30,7 +30,7 @@ export const ErgonomicGuidelines = (): JSX.Element => {
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4}>
-          <UnorderedList alignItems="start" pl={8}>
+          <UnorderedList alignItems="start" pl={8} textAlign="start">
             <ListItem>
               <Text opacity={0.8} fontSize={{ base: "md", lg: "lg" }}>
                 Sit back in your chair.
