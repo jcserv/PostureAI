@@ -1,6 +1,11 @@
 import * as faceapi from "face-api.js";
 
-import { absolutePositionCheck, proximityCheck, forwardTiltCheck, sideTiltCheck } from "./postureChecks";
+import {
+  absolutePositionCheck,
+  proximityCheck,
+  forwardTiltCheck,
+  sideTiltCheck,
+} from "./postureChecks";
 
 const MODEL_URL = "./models";
 
@@ -24,16 +29,16 @@ const detectLandmarks = async (
     .detectSingleFace(input)
     .withFaceLandmarks(true);
 
-    if (detectionsWithLandmarks) {
-        console.log({
-            leftEye: detectionsWithLandmarks.landmarks.getLeftEye(),
-            rightEye: detectionsWithLandmarks.landmarks.getRightEye(),
-            mouth: detectionsWithLandmarks.landmarks.getMouth(),
-            nose: detectionsWithLandmarks.landmarks.getNose(),
-            jaw: detectionsWithLandmarks.landmarks.getJawOutline(),
-        })
-        return detectionsWithLandmarks
-    };
+  if (detectionsWithLandmarks) {
+    console.log({
+      leftEye: detectionsWithLandmarks.landmarks.getLeftEye(),
+      rightEye: detectionsWithLandmarks.landmarks.getRightEye(),
+      mouth: detectionsWithLandmarks.landmarks.getMouth(),
+      nose: detectionsWithLandmarks.landmarks.getNose(),
+      jaw: detectionsWithLandmarks.landmarks.getJawOutline(),
+    });
+    return detectionsWithLandmarks;
+  }
   return null;
 };
 
@@ -66,7 +71,7 @@ const isBadPosture = async (
     faceapi.FaceLandmarks68
   >,
   input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement,
-  sensitivity : number = 5
+  sensitivity: number = 5
 ): Promise<Boolean | null> => {
   console.log("Initiate posture check");
   const newDetection = await detectLandmarks(input);
@@ -76,7 +81,7 @@ const isBadPosture = async (
     return null;
   }
 
-  const limit = 0.1 + (10-sensitivity)/100
+  const limit = 0.1 + (10 - sensitivity) / 100;
 
   return (
     // absolutePositionCheck(
@@ -94,19 +99,19 @@ const isBadPosture = async (
     ) ||
     console.log("Proximity check passed") ||
     sideTiltCheck(
-        input.width,
-        input.height,
-        groundTruthDetection,
-        newDetection,
-        limit
+      input.width,
+      input.height,
+      groundTruthDetection,
+      newDetection,
+      limit
     ) ||
     console.log("Side angle tilt check passed")
-        // forwardTiltCheck(
-        //     input.width,
-        //     input.height,
-        //     groundTruthDetection,
-        //     newDetection
-        // ) ||
+    // forwardTiltCheck(
+    //     input.width,
+    //     input.height,
+    //     groundTruthDetection,
+    //     newDetection
+    // ) ||
   );
 };
 
