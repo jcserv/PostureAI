@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { RepeatIcon, TimeIcon } from "@chakra-ui/icons";
 import React, { useState, useEffect } from "react";
+
 interface FormProps {
   calibrate: () => void;
   devices: InputDeviceInfo[];

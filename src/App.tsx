@@ -100,7 +100,11 @@ function App() {
 
   const verifyPosture = async (img: HTMLImageElement) => {
     if (calibratedLandmarks) {
-      const hasBadPosture = await isBadPosture(calibratedLandmarks, img);
+      const hasBadPosture = await isBadPosture(
+        calibratedLandmarks,
+        img,
+        sensitivity
+      );
       if (hasBadPosture) {
         displayErrorToast("Your posture requires correction!");
         drawFaceMesh(calibratedLandmarks);
