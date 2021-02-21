@@ -12,28 +12,43 @@ import {
   SliderThumb,
   Text,
   VStack,
+  useColorModeValue,
 } from "@chakra-ui/react";
-import { TimeIcon } from "@chakra-ui/icons";
+import { RepeatIcon, TimeIcon } from "@chakra-ui/icons";
 import React, { useState, useEffect } from "react";
+
 interface FormProps {
-  devices: InputDeviceInfo[];
   calibrate: (sliderVal: number) => void;
-  webcamId: string;
+  devices: InputDeviceInfo[];
+  interval: number;
+  sensitivity: number;
+  setIntervalTime: React.Dispatch<React.SetStateAction<number>>;
+  setSensitivity: React.Dispatch<React.SetStateAction<number>>;
   setwebcamId: React.Dispatch<React.SetStateAction<string>>;
+  webcamId: string;
 }
 
 export const Form: React.FC<FormProps> = ({
-  devices,
   calibrate,
-  webcamId,
+  devices,
+  interval,
+  sensitivity,
+  setIntervalTime,
+  setSensitivity,
   setwebcamId,
+  webcamId,
 }): JSX.Element => {
-  const [sliderVal, setSliderVal] = useState(90);
+  const [hasBeenClicked, setHasBeenClicked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [sliderVal, setSliderVal] = useState(interval);
+  const [sensVal, setSensVal] = useState(sensitivity);
   useEffect(() => {
     if (devices.length > 0) {
       setwebcamId(devices[0].deviceId);
     }
-  }, [devices]);
+  }, [devices, setwebcamId]);
+
+  const color = useColorModeValue("purple.500", "purple.300");
 
   return (
     <form style={{ width: "100%" }}>
@@ -60,11 +75,11 @@ export const Form: React.FC<FormProps> = ({
             value={sliderVal}
             onChange={(val) => setSliderVal(val)}
           >
-            <SliderTrack bg="red.100">
-              <SliderFilledTrack bg="tomato" />
+            <SliderTrack bg={color}>
+              <SliderFilledTrack bg={color} />
             </SliderTrack>
             <SliderThumb boxSize={6}>
-              <Box color="tomato" as={TimeIcon} />
+              <Box color={color} as={TimeIcon} />
             </SliderThumb>
           </Slider>
           <Center>
@@ -74,9 +89,41 @@ export const Form: React.FC<FormProps> = ({
             Select how frequently you want us to check your posture!
           </FormHelperText>
         </FormControl>
+        <FormControl id="sensitivity" w="100%">
+          <FormLabel>Sensitivity</FormLabel>
+          <Slider
+            aria-label="slider-ex-4"
+            min={1}
+            max={10}
+            value={sensVal}
+            onChange={(val) => setSensVal(val)}
+          >
+            <SliderTrack bg={color}>
+              <SliderFilledTrack bg={color} />
+            </SliderTrack>
+            <SliderThumb boxSize={6}>
+              <Box color={color} as={RepeatIcon} />
+            </SliderThumb>
+          </Slider>
+          <Center>
+            <Text>{sensVal}</Text>
+          </Center>
+          <FormHelperText>Select the sensitivity</FormHelperText>
+        </FormControl>
         <Center>
           <Button
+            colorScheme="teal"
+            isLoading={isLoading}
             onClick={() => {
+              if (!hasBeenClicked) {
+                setIsLoading(true);
+                setInterval(() => {
+                  setIsLoading(false);
+                }, 3000);
+              }
+              setHasBeenClicked(true);
+              setIntervalTime(sliderVal);
+              setSensitivity(sensVal);
               calibrate(sliderVal);
             }}
           >

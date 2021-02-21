@@ -1,6 +1,11 @@
 import * as faceapi from "face-api.js";
 
-import { absolutePositionCheck, proximityCheck } from "./postureChecks";
+import {
+  absolutePositionCheck,
+  proximityCheck,
+  forwardTiltCheck,
+  sideTiltCheck,
+} from "./postureChecks";
 
 const MODEL_URL = "./models";
 
@@ -23,8 +28,18 @@ const detectLandmarks = async (
   const detectionsWithLandmarks = await faceapi
     .detectSingleFace(input)
     .withFaceLandmarks(true);
-  if (detectionsWithLandmarks) return detectionsWithLandmarks;
-  else return null;
+
+  if (detectionsWithLandmarks) {
+    console.log({
+      leftEye: detectionsWithLandmarks.landmarks.getLeftEye(),
+      rightEye: detectionsWithLandmarks.landmarks.getRightEye(),
+      mouth: detectionsWithLandmarks.landmarks.getMouth(),
+      nose: detectionsWithLandmarks.landmarks.getNose(),
+      jaw: detectionsWithLandmarks.landmarks.getJawOutline(),
+    });
+    return detectionsWithLandmarks;
+  }
+  return null;
 };
 
 const drawFeatures = (
@@ -44,7 +59,7 @@ const drawFeatures = (
   const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
   if (resizedDetections) {
-    console.log("im drawing");
+    console.log("Drawing face outline");
     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
   }
 };
@@ -55,7 +70,8 @@ const isBadPosture = async (
     { detection: faceapi.FaceDetection },
     faceapi.FaceLandmarks68
   >,
-  input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
+  input: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement,
+  sensitivity: number = 5
 ): Promise<Boolean | null> => {
   console.log("Initiate posture check");
   const newDetection = await detectLandmarks(input);
@@ -65,19 +81,37 @@ const isBadPosture = async (
     return null;
   }
 
+  const limit = 0.1 + (10 - sensitivity) / 100;
+
   return (
-    absolutePositionCheck(
-      input.width,
-      input.height,
-      groundTruthDetection,
-      newDetection
-    ) ||
+    // absolutePositionCheck(
+    //   input.width,
+    //   input.height,
+    //   groundTruthDetection,
+    //   newDetection
+    // ) ||
     proximityCheck(
       input.width,
       input.height,
       groundTruthDetection,
-      newDetection
-    )
+      newDetection,
+      limit
+    ) ||
+    console.log("Proximity check passed") ||
+    sideTiltCheck(
+      input.width,
+      input.height,
+      groundTruthDetection,
+      newDetection,
+      limit
+    ) ||
+    console.log("Side angle tilt check passed")
+    // forwardTiltCheck(
+    //     input.width,
+    //     input.height,
+    //     groundTruthDetection,
+    //     newDetection
+    // ) ||
   );
 };
 

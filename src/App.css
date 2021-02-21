@@ -25,6 +25,10 @@ a {
   align-items: center;
 }
 
+.header {
+  font-family: "Montserrat", sans-serif;
+}
+
 .column {
   max-width: 35vw;
 }

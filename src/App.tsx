@@ -47,12 +47,12 @@ function App() {
   const toast = useToast();
   // one pixel image url xd
   const [devices, setDevices] = useState([]);
-  const [hasLoaded, setHasLoaded] = useState(false);
   const [hasPermissions, setHasPermissions] = useState(true);
   const [imgSrc, setImgSrc] = useState("https://i.imgur.com/AnRSQSq.png");
   const [intervalTime, setIntervalTime] = useState(90);
   const [countDown, setCountDown] = useState(90);
   const [timer, setTimer] = useState(false);
+  const [sensitivity, setSensitivity] = useState(5);
   const [
     calibratedLandmarks,
     setCalibratedLandmarks,
@@ -64,11 +64,7 @@ function App() {
   const [play] = useSound(notification, { volume: 0.1 });
   const [webcamId, setwebcamId] = useState("");
   useEffect(() => {
-    async function load() {
-      await loadModels();
-      setHasLoaded(true);
-    }
-    load(); 
+    loadModels();
   }, []);
   const displaySuccessToast = (message: string) => {
     toast({
@@ -106,7 +102,11 @@ function App() {
 
   const verifyPosture = async (img: HTMLImageElement) => {
     if (calibratedLandmarks) {
-      const hasBadPosture = await isBadPosture(calibratedLandmarks, img);
+      const hasBadPosture = await isBadPosture(
+        calibratedLandmarks,
+        img,
+        sensitivity
+      );
       if (hasBadPosture) {
         displayErrorToast("Your posture requires correction!");
         drawFaceMesh(calibratedLandmarks);
@@ -131,7 +131,7 @@ function App() {
       });
 
     } else {
-      //displayErrorToast("Unable to detect user.");
+      displayErrorToast("Unable to detect user.");
     }
   };
 
@@ -156,38 +156,7 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    // Continually draw face mesh on video
-    // Capture user based on interval set
-    const timer = setInterval(async () => {
-      if (calibratedLandmarks || !hasLoaded) return;
-      const newLandmarks = await capture();
-      if (newLandmarks) {
-        drawFaceMesh(newLandmarks);
-      } else {
-        displayErrorToast("Unable to detect user.");
-      }
-    }, 33);
-    return () => clearInterval(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calibratedLandmarks, capture]);
 
-  // useEffect(() => {
-  //   // Regular posture checks
-  //   // Capture user based on interval set
-  //   const timer = setInterval(async () => {
-  //     if (!calibratedLandmarks) return;
-  //     const newLandmarks = await capture();
-  //     if (newLandmarks) {
-  //       const img = document.getElementById("capture") as HTMLImageElement;
-  //       verifyPosture(img);
-  //     } else {
-  //       displayErrorToast("Unable to detect user.");
-  //     }
-  //   }, intervalTime * 1000);
-  //   return () => clearInterval(timer);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [calibratedLandmarks, capture, intervalTime]);
 
   useEffect(() => {
     console.log(timer);
@@ -244,6 +213,7 @@ function App() {
                 className="coveredImage"
                 height={200}
                 ref={webcamRef}
+                mirrored={true}
                 screenshotFormat="image/png"
                 width={500}
                 videoConstraints={{ deviceId: webcamId }}
@@ -270,9 +240,11 @@ function App() {
         <Form
           calibrate={calibrate}
           devices={devices}
-          setInterval={setIntervalTime}
           interval={intervalTime}
           webcamId={webcamId}
+          sensitivity={sensitivity}
+          setIntervalTime={setIntervalTime}
+          setSensitivity={setSensitivity}
           setwebcamId={setwebcamId}
         />
         <img
