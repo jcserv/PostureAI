@@ -202,7 +202,7 @@ function App() {
           interval={intervalTime}
           webcamId={webcamId}
           sensitivity={sensitivity}
-          setInterval={setIntervalTime}
+          setIntervalTime={setIntervalTime}
           setSensitivity={setSensitivity}
           setwebcamId={setwebcamId}
         />
