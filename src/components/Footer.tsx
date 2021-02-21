@@ -6,7 +6,7 @@ export const Footer = (): JSX.Element => {
     {
       label: "Github",
       icon: VscGithubInverted,
-      url: "https://github.com/jcserv/posture.ai/",
+      url: "https://github.com/jcserv/PostureAI/",
     },
   ];
   return (

@@ -13,10 +13,10 @@
 
 </div>
 
-  <h2 align="center">posture.ai</h2>
+  <h2 align="center">PostureAI</h2>
 
   <p align="center">
-    posture.ai analyzes your posture & notifies you in real-time!
+    PostureAI analyzes your posture & notifies you in real-time!
     <br />
     <a href="https://postureai.tech">View Demo</a>
   </p>
@@ -50,7 +50,7 @@
 ## About The Project
 
 With work-from-home becoming a way of life due to COVID-19, it can be easy to slump over while working resulting in back pain & long-term health effects.
-posture.ai detects your posture on a regular intervals and helps correct it!
+PostureAI detects your posture on a regular intervals and helps correct it!
 
 ### Built With
 
@@ -97,7 +97,7 @@ Happy hacking!
 3. Set the timer
 4. Click calibrate!
 
-posture.ai will notify you if your posture changes negatively, allowing you to correct it quickly.
+PostureAI will notify you if your posture changes negatively, allowing you to correct it quickly.
 
 <!-- LICENSE -->
 
@@ -117,11 +117,11 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 [Jarrod Servilla](https://www.linkedin.com/in/jarrod-servilla/) - jarrod.servilla@gmail.com
 
-[contributors-shield]: https://img.shields.io/github/contributors/jcserv/posture.ai
-[contributors-url]: https://github.com/jcserv/posture.ai/graphs/contributors
-[stars-shield]: https://img.shields.io/github/stars/jcserv/posture.ai
-[stars-url]: https://github.com/jcserv/posture.ai/stargazers
-[issues-shield]: https://img.shields.io/github/issues/jcserv/posture.ai
-[issues-url]: https://github.com/jcserv/posture.ai/issues
-[license-shield]: https://img.shields.io/github/license/jcserv/posture.ai
-[license-url]: https://github.com/jcserv/posture.ai/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/jcserv/PostureAI
+[contributors-url]: https://github.com/jcserv/PostureAI/graphs/contributors
+[stars-shield]: https://img.shields.io/github/stars/jcserv/PostureAI
+[stars-url]: https://github.com/jcserv/PostureAI/stargazers
+[issues-shield]: https://img.shields.io/github/issues/jcserv/PostureAI
+[issues-url]: https://github.com/jcserv/PostureAI/issues
+[license-shield]: https://img.shields.io/github/license/jcserv/PostureAI
+[license-url]: https://github.com/jcserv/PostureAI/blob/main/LICENSE
