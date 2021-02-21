@@ -157,9 +157,7 @@ function App() {
   }
 
 
-
   useEffect(() => {
-    console.log(timer);
     if(timer) {
       if(countDown > 1) {
         const time = setTimeout(() => setCountDown(countDown - 1), 1000);
@@ -171,15 +169,8 @@ function App() {
       }
     }
     else {
-      console.log(countDown);
-        if(countDown == 0) {
-          const time = setTimeout(() => {setCountDown(countDown - 1); comparePostures(); }, 1000);
-          return () => clearTimeout(time);
-        }
-        else {
-          const time = setTimeout(() => {setCountDown(countDown - 1); comparePostures();}, 1000);
-          return () => clearTimeout(time);
-        }
+        const time = setTimeout(() => {setCountDown(countDown - 1); comparePostures(); }, 1000);
+        return () => clearTimeout(time);
     }
   }, [timer, intervalTime, countDown]);
 
