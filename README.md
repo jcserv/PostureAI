@@ -1,7 +1,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="img/logo.png" alt="Logo">
+    <img src="public/logo.png" alt="Logo">
   </a>
 
   <div align="center">
